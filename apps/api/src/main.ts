@@ -1,6 +1,5 @@
 import fastify from 'fastify'
 import loadConfig from './config/env.config'
-import pino from 'pino';
 
 loadConfig();
 
@@ -9,7 +8,16 @@ const host = String(process.env.API_HOST)
 
 const startServer = async () => {
   const server = fastify({
-    logger: pino({level: process.env.LOG_LEVEL})
+    logger: {
+      transport: {
+        target: 'pino-pretty',
+        options: {
+          translateTime: 'HH:MM:ss Z',
+          ignore: 'pid,hostname',
+        },
+      },
+      level: process.env.LOG_LEVEL
+    }
   })
 
   //Register middlewares
@@ -37,7 +45,7 @@ const startServer = async () => {
         await server.close()
         server.log.error(`Close application on ${signal}`)
         process.exit(0)
-      } catch (err) {
+      } catch (err: any) {
         server.log.error(`Error closing application on ${signal}`, err)
         process.exit(1)
       }
