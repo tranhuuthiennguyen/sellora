@@ -1,10 +1,10 @@
 import fastify from 'fastify'
 import loadConfig from './config/env.config'
 
-loadConfig();
+const env = loadConfig();
 
-const port = Number(process.env.API_PORT) || 5001
-const host = String(process.env.API_HOST)
+const port = Number(env.API_PORT) || 5001
+const host = String(env.API_HOST)
 
 const startServer = async () => {
   const server = fastify({
@@ -16,7 +16,7 @@ const startServer = async () => {
           ignore: 'pid,hostname',
         },
       },
-      level: process.env.LOG_LEVEL
+      level: env.LOG_LEVEL
     }
   })
 

@@ -2,7 +2,7 @@ import path from "path";
 import dotenv from "dotenv"
 import * as z from 'zod'
 
-export default function loadConfig(): void {
+export default function loadConfig(): any {
   const envPath = path.join(__dirname, '..', '..', '.env');
 
   const envConfig = dotenv.config({path: envPath})
@@ -25,4 +25,6 @@ export default function loadConfig(): void {
   if(!parsedEnv.success) {
     throw new Error(`Env config validation error: ${parsedEnv.error}`)
   }
+
+  return parsedEnv
 }
