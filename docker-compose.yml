@@ -1,6 +1,7 @@
 services:
   postgres:
     image: postgres:latest
+    restart: "always"
     ports:
       - '5432:5432'
     environment:
@@ -12,19 +13,19 @@ services:
     networks:
       - backend
 
-  api:
-    build:
-      dockerfile: ./apps/api/Dockerfile
-      context: .
-    ports:
-      - 5000:5000
-    env_file:
-      - ./apps/api/.env
-    volumes:
-      - ./:/usr/src/app
-      - /usr/src/app/node_modules
-    networks:
-      - backend
+  # api:
+  #   build:
+  #     dockerfile: ./apps/api/Dockerfile
+  #     context: .
+  #   ports:
+  #     - 5000:5000
+  #   env_file:
+  #     - ./apps/api/.env
+  #   volumes:
+  #     - ./:/usr/src/app
+  #     - /usr/src/app/node_modules
+  #   networks:
+  #     - backend
 
 networks:
   backend:
@@ -32,6 +33,4 @@ networks:
 
 volumes:
   pg_data:
-    driver: local
-  redis_data:
     driver: local

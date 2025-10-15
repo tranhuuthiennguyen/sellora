@@ -1,24 +1,18 @@
 import fastify from 'fastify'
-import loadConfig from './config/env.config'
-
-const env = loadConfig();
+import { env } from "@api/config/env.config"
+import { logger } from "@api/utils/logger"
+import dbPlugin from '@api/db'
 
 const port = Number(env.API_PORT) || 5001
 const host = String(env.API_HOST)
 
 const startServer = async () => {
   const server = fastify({
-    logger: {
-      transport: {
-        target: 'pino-pretty',
-        options: {
-          translateTime: 'HH:MM:ss Z',
-          ignore: 'pid,hostname',
-        },
-      },
-      level: env.LOG_LEVEL
-    }
+    loggerInstance: logger
   })
+
+  //Register database
+  server.register(dbPlugin)
 
   //Register middlewares
 
