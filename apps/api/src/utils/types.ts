@@ -3,6 +3,6 @@ import * as schema from "@api/db/schema"
 
 declare module 'fastify' {
   interface FastifyInstance {
-    db: PostgresJsDatabase<typeof schema>;
+    db: PostgresJsDatabase<typeof schema>
   }
 }

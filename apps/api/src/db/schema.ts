@@ -9,6 +9,7 @@ import {
   boolean
 } from "drizzle-orm/pg-core"
 
+
 export const userRoleEnum = pgEnum("user_role", ["user", "admin", "moderator"]);
 export const difficultyEnum = pgEnum("difficulty", ["beginner", "intermediate", "advanced"]);
 

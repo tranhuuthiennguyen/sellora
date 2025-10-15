@@ -17,7 +17,6 @@ const main = async () => {
   const db = drizzle(client, { schema })
 
   await reset(db, schema)
-
   await seedUsers(db, 10)
   await seedCategories(db)
   await seedDecks(db, 20)

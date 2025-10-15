@@ -20,7 +20,6 @@ export const categories = [
 
 export const seedCategories = async (db: PostgresJsDatabase<typeof schema>) => {
   const data: (typeof schema.categories.$inferInsert)[] = []
-
   for (let i = 0; i < categories.length; i++) {
     data.push({
       title: categories[i]!,

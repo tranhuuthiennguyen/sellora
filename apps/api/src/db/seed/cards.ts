@@ -4,7 +4,6 @@ import { faker } from '@faker-js/faker'
 
 export const seedCards = async (db: PostgresJsDatabase<typeof schema>, count: number) => {
   const data: (typeof schema.cards.$inferInsert)[] = []
-
   const decks = await db.select({id: schema.decks.id, createdAt: schema.decks.createdAt}).from(schema.decks)
   for (let i = 0; i < count; i++) {
     const deck = faker.helpers.arrayElement(decks)

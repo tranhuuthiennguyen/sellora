@@ -53,7 +53,7 @@ const startServer = async () => {
       host,
     })
   } catch (err) {
-    server.log.error(err)
+    server.log.error(err);
     process.exit(1)
   }
 }

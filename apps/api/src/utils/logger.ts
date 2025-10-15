@@ -6,7 +6,7 @@ export const logger = pino({
     target: 'pino-pretty',
     options: {
       translateTime: 'HH:MM:ss Z',
-      ignore: 'pid,hostname',
+      ignore: 'pid, hostname',
     },
   },
   level: env.LOG_LEVEL

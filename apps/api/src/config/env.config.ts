@@ -12,7 +12,6 @@ if (envConfig.error) {
     `Failed to load .env file from path ${envPath}: ${envConfig.error.message}`
   )
 }
-
 const schema = z.looseObject({
   NODE_ENV: z.enum(["development", "testing", "production"]),
   LOG_LEVEL: z.enum(["debug", "info", "warn", "error", "fatal"]),

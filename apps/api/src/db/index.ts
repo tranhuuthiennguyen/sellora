@@ -12,7 +12,6 @@ const dbPlugin = fp(async (fastify) => {
       .connect()
       .then((client) => {
         logger.info("Connected to database.")
-
         return client
       })
       .catch((error) => {

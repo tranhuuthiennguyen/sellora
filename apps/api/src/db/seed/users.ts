@@ -5,7 +5,6 @@ import * as bcrypt from 'bcrypt'
 
 export const seedUsers = async (db: PostgresJsDatabase<typeof schema>, count: number) => {
   const data: (typeof schema.users.$inferInsert)[] = []
-
   for (let i = 0; i < count; i++) {
     const password = faker.internet.password({ length: 12 })
     const passwordHash = await bcrypt.hash(password, 10)
