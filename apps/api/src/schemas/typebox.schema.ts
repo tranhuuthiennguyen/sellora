@@ -1,0 +1,40 @@
+import type { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
+import type {
+  ContextConfigDefault,
+  FastifyBaseLogger,
+  FastifyInstance,
+  FastifyReply,
+  FastifyRequest,
+  RawReplyDefaultExpression,
+  RawRequestDefaultExpression,
+  RawServerDefault,
+  RouteGenericInterface,
+} from "fastify";
+import { FastifySchema } from "fastify/types/schema";
+
+export type FastifyTypeBox = FastifyInstance<
+  RawServerDefault,
+  RawRequestDefaultExpression,
+  RawReplyDefaultExpression,
+  FastifyBaseLogger,
+  TypeBoxTypeProvider
+>;
+
+export type FastifyRequestTypeBox<TSchema extends FastifySchema> =
+  FastifyRequest<
+    RouteGenericInterface,
+    RawServerDefault,
+    RawRequestDefaultExpression,
+    TSchema,
+    TypeBoxTypeProvider
+  >;
+
+export type FastifyReplyTypeBox<TSchema extends FastifySchema> = FastifyReply<
+  RouteGenericInterface,
+  RawServerDefault,
+  RawRequestDefaultExpression,
+  RawReplyDefaultExpression,
+  ContextConfigDefault,
+  TSchema,
+  TypeBoxTypeProvider
+>;

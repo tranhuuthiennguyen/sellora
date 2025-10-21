@@ -1,5 +1,8 @@
 import pino from "pino";
-import { env } from "@api/config/env.config";
+import * as dotenv from "dotenv";
+import { envPath } from "@/config";
+
+dotenv.config({ path: envPath });
 
 export const logger = pino({
   transport: {
@@ -9,5 +12,5 @@ export const logger = pino({
       ignore: "pid,hostname",
     },
   },
-  level: env.LOG_LEVEL,
+  level: process.env.LOG_LEVEL,
 });

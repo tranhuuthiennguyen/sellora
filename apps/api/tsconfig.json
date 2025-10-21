@@ -1,13 +1,23 @@
 {
   "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
-    "outDir": "./dist",
+    "outDir": "dist",
+    "baseUrl": "./src",
     "paths": {
-      "@api/*": ["./src/*"]
+      "@/*": ["./*"],
+      "@config": ["config"],
+      "@contants": ["constants"],
+      "@db/*": ["db/*"],
+      "@modules/*": ["modules/*"],
+      "@plugins/*": ["plugins/*"],
+      "@schemas/*": ["schemas/*"],
+      "@utils/*": ["utils/*"],
+      "@types/*": ["types/*"]
     }
   },
+  "include": ["src/**/*.ts", "src/**/*.json", ".env", "src/**/*.feature", "src/**/*.d.ts"],
   "exclude": [
     "node_modules",
-    "./dist/**/*"
+    "dist"
   ]
 }

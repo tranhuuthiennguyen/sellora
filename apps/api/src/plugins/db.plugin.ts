@@ -1,14 +1,13 @@
 import fp from "fastify-plugin";
-import * as schema from "@api/db/schema";
-import { env } from "@api/config/env.config";
+import * as schema from "@db/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import { logger } from "@api/utils/logger";
+import { logger } from "@utils/logger";
 
 const dbPlugin = fp(
   async (fastify) => {
     const pool = await new Pool({
-      connectionString: env.DATABASE_URL,
+      connectionString: fastify.config.DATABASE_URL,
     })
       .connect()
       .then((client) => {

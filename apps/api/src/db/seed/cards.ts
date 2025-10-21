@@ -1,5 +1,5 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import * as schema from "@api/db/schema";
+import * as schema from "@db/schema";
 import { faker } from "@faker-js/faker";
 
 export const seedCards = async (

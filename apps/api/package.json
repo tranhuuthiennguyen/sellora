@@ -2,10 +2,9 @@
   "name": "api",
   "version": "1.0.0",
   "description": "",
-  "main": "main.js",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "dev": "node dist/main.js",
+    "start": "node -r module-alias/register dist/server.js",
     "generate": "npx drizzle-kit generate",
     "migrate": "npx drizzle-kit migrate",
     "seed": "tsx ./src/db/seed/index.ts"
@@ -15,26 +14,32 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@fastify/env": "^5.0.3",
+    "@fastify/type-provider-typebox": "^6.1.0",
+    "@sinclair/typebox": "^0.34.41",
+    "ajv-errors": "^3.0.0",
     "bcrypt": "^6.0.0",
     "dotenv": "^16.0.3",
     "drizzle-orm": "^0.44.6",
     "drizzle-seed": "^0.3.1",
     "fastify": "^5.6.1",
     "fastify-plugin": "^5.1.0",
+    "module-alias": "^2.2.3",
     "pg": "^8.16.3",
-    "pino": "^9.13.1",
-    "zod": "^4.1.11"
+    "pino": "^9.13.1"
   },
   "devDependencies": {
     "@faker-js/faker": "^10.0.0",
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
     "@types/bcrypt": "^6.0.0",
+    "@types/module-alias": "^2.0.4",
     "@types/node": "^22.18.8",
     "@types/pg": "^8.15.5",
     "drizzle-kit": "^0.31.5",
     "eslint": "^9.37.0",
     "pino-pretty": "^13.1.1",
+    "tsconfig-paths": "^4.2.0",
     "tsx": "^4.20.6",
     "typescript": "^5.9.2"
   },
@@ -43,5 +48,16 @@
       "eslint --fix",
       "prettier --write"
     ]
+  },
+  "_moduleAliases": {
+    "@": "dist",
+    "@config": "dist/config",
+    "@contants": "dist/constants",
+    "@db": "dist/db",
+    "@modules": "dist/modules",
+    "@plugins": "dist/plugins",
+    "@schemas": "dist/schemas",
+    "@utils": "dist/utils",
+    "@types": "dist/types"
   }
 }

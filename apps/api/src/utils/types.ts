@@ -1,8 +1,0 @@
-import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
-import * as schema from "@api/db/schema";
-
-declare module "fastify" {
-  interface FastifyInstance {
-    db: PostgresJsDatabase<typeof schema>;
-  }
-}

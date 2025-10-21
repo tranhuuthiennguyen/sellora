@@ -1,7 +1,7 @@
 import { Pool } from "pg";
 import * as dotenv from "dotenv";
 import { drizzle } from "drizzle-orm/node-postgres";
-import * as schema from "@api/db/schema";
+import * as schema from "@db/schema";
 import { seedUsers } from "./users";
 import { reset } from "drizzle-seed";
 import { seedCategories } from "./categories";
