@@ -1,6 +1,36 @@
-import { ERROR400, ERROR409, ERROR500, responseProperty } from "@/constants";
 import { Type } from "@sinclair/typebox";
 import { FastifySchema } from "fastify";
+
+export const GetUserSchema = Type.Object({
+  username: Type.String(),
+  email: Type.String({
+    format: "email",
+    errorMessage: { format: "Invalid Email" },
+  }),
+  role: Type.Union([
+    Type.Literal("user"),
+    Type.Literal("admin"),
+    Type.Literal("moderator"),
+  ]),
+  avatarUrl: Type.String(),
+  createdAt: Type.String({ format: "date-time" }),
+  updatedAt: Type.String({ format: "date-time" }),
+});
+
+export const GetUserByIdSchema: FastifySchema = {
+  params: Type.Object({
+    userId: Type.String(),
+  }),
+  response: {
+    200: GetUserSchema,
+  },
+};
+
+export const GetAllUsersResponseSchema: FastifySchema = {
+  response: {
+    200: Type.Array(GetUserSchema),
+  },
+};
 
 export const CreateUserBody = Type.Object({
   username: Type.String(),
@@ -24,7 +54,6 @@ export const CreateUserSchema: FastifySchema = {
     201: {
       type: "object",
       properties: {
-        ...responseProperty,
         data: {
           type: "object",
           properties: {
@@ -34,10 +63,5 @@ export const CreateUserSchema: FastifySchema = {
         },
       },
     },
-    400: ERROR400,
-    409: ERROR409,
-    500: ERROR500,
   },
 };
-
-export const GetUserByIdSchema: FastifySchema = {};

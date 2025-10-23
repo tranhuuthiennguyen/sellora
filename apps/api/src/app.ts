@@ -6,6 +6,8 @@ import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import ajvErrors from "ajv-errors";
 import { envOptions } from "@config";
 import fastifyEnv from "@fastify/env";
+import authRouter from "@/modules/auth/auth.router";
+import usersRouter from "./modules/users/users.router";
 
 export async function buildApp() {
   const app = fastify({
@@ -20,13 +22,28 @@ export async function buildApp() {
     },
   }).withTypeProvider<TypeBoxTypeProvider>();
 
-  app.register(fastifyEnv, envOptions);
+  await app.register(fastifyEnv, envOptions);
 
   app.register(dbPlugin);
 
   //Register middlewares
 
   //Register routes
+  app.register(
+    (fastify, _, done) => {
+      //Root route
+      app.register(async (instance, opts) => {
+        instance.get("/", async (request, reply) => {
+          return { message: "Hello World!" };
+        });
+      });
+      fastify.register(authRouter, { prefix: "/auth" });
+      fastify.register(usersRouter, { prefix: "/users" });
+
+      done();
+    },
+    { prefix: "/api" },
+  );
 
   //Set error handler
   app.setErrorHandler((error, _request, reply) => {
@@ -35,16 +52,6 @@ export async function buildApp() {
   });
 
   //Health check
-
-  //Root route
-  app.register(
-    async (instance, opts) => {
-      instance.get("/", async (request, reply) => {
-        return { message: "Hello World!" };
-      });
-    },
-    { prefix: "/api" },
-  );
 
   return app;
 }
