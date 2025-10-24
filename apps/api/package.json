@@ -6,8 +6,8 @@
     "build": "tsc -p tsconfig.json",
     "start": "node -r module-alias/register dist/server.js",
     "dev": "nodemon",
-    "generate": "npx drizzle-kit generate",
-    "migrate": "npx drizzle-kit migrate",
+    "generate": "npx drizzle-kit generate --config=src/db/drizzle.config.ts",
+    "migrate": "npx drizzle-kit migrate --config=src/db/drizzle.config.ts",
     "seed": "tsx ./src/db/seed/index.ts"
   },
   "keywords": [],
@@ -61,7 +61,6 @@
     "@modules": "dist/modules",
     "@plugins": "dist/plugins",
     "@schemas": "dist/schemas",
-    "@utils": "dist/utils",
-    "@types": "dist/types"
+    "@utils": "dist/utils"
   }
 }

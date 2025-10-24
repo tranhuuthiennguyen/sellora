@@ -1,17 +1,14 @@
+import { BaseResponseSchema } from "@schemas/common.schema";
 import { Type } from "@sinclair/typebox";
 import { FastifySchema } from "fastify";
 
-export const GetUserSchema = Type.Object({
+export const UserSchema = Type.Object({
+  id: Type.Number(),
   username: Type.String(),
   email: Type.String({
     format: "email",
     errorMessage: { format: "Invalid Email" },
   }),
-  role: Type.Union([
-    Type.Literal("user"),
-    Type.Literal("admin"),
-    Type.Literal("moderator"),
-  ]),
   avatarUrl: Type.String(),
   createdAt: Type.String({ format: "date-time" }),
   updatedAt: Type.String({ format: "date-time" }),
@@ -22,18 +19,27 @@ export const GetUserByIdSchema: FastifySchema = {
     userId: Type.String(),
   }),
   response: {
-    200: GetUserSchema,
+    200: Type.Intersect([
+      BaseResponseSchema,
+      Type.Object({
+        data: UserSchema,
+      }),
+    ]),
   },
 };
 
 export const GetAllUsersResponseSchema: FastifySchema = {
   response: {
-    200: Type.Array(GetUserSchema),
+    200: Type.Intersect([
+      BaseResponseSchema,
+      Type.Object({
+        data: Type.Array(UserSchema),
+      }),
+    ]),
   },
 };
 
 export const CreateUserBody = Type.Object({
-  username: Type.String(),
   email: Type.String({
     format: "email",
     errorMessage: { format: "Invalid Email" },
@@ -51,17 +57,25 @@ export const CreateUserBody = Type.Object({
 export const CreateUserSchema: FastifySchema = {
   body: CreateUserBody,
   response: {
-    201: {
-      type: "object",
-      properties: {
-        data: {
-          type: "object",
-          properties: {
-            username: { type: "string" },
-            email: { type: "string" },
-          },
-        },
-      },
-    },
+    201: Type.Intersect([
+      BaseResponseSchema,
+      Type.Object({
+        data: UserSchema,
+      }),
+    ]),
+  },
+};
+
+export const UpdateUserBody = Type.Partial(UserSchema);
+
+export const UpdateUserSchema: FastifySchema = {
+  body: UpdateUserBody,
+  response: {
+    200: Type.Intersect([
+      BaseResponseSchema,
+      Type.Object({
+        data: UserSchema,
+      }),
+    ]),
   },
 };

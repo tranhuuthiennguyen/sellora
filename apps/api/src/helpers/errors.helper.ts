@@ -12,7 +12,7 @@ export class AppError extends Error {
 
 export const ERRORS = {
   // USERS
-  userExists: new AppError("User already exists", 409),
+  userExists: new AppError("User with this Email/Username already exists", 409),
   userNotExists: new AppError("User not exists", 404),
   // SERVER
   internalServerError: new AppError("Internal Server Error", 500),

@@ -48,6 +48,11 @@ export async function buildApp() {
   //Set error handler
   app.setErrorHandler((error, _request, reply) => {
     app.log.error(error);
+
+    if (error.validation) {
+      const message = error.validation.map((v) => v.message).join(", ");
+      reply.status(400).send({ error: "Validation Error", message });
+    }
     reply.status(500).send({ error: "Something went wrong" });
   });
 

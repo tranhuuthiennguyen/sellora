@@ -1,3 +1,5 @@
+import { Type } from "@sinclair/typebox";
+
 export const STANDARD = {
   OK: {
     message: "OK",

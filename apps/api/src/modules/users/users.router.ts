@@ -3,8 +3,13 @@ import {
   createUserHandler,
   getAllUsersHandler,
   getUserByIdHandler,
+  updateUserById,
 } from "./users.controller";
-import { GetAllUsersResponseSchema, GetUserByIdSchema } from "./users.schema";
+import {
+  CreateUserSchema,
+  GetAllUsersResponseSchema,
+  GetUserByIdSchema,
+} from "./users.schema";
 
 const usersRouter = async (fastify: FastifyInstance) => {
   //GET ALL
@@ -25,9 +30,21 @@ const usersRouter = async (fastify: FastifyInstance) => {
     getUserByIdHandler,
   );
   //CREATE USER
-  fastify.post("/", createUserHandler);
+  fastify.post(
+    "/",
+    {
+      schema: CreateUserSchema,
+    },
+    createUserHandler,
+  );
   //UPDATE BY ID
-
+  fastify.patch(
+    "/:userId",
+    {
+      schema: {},
+    },
+    updateUserById,
+  );
   //DELETE BY ID
 };
 
