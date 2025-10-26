@@ -1,14 +1,16 @@
 import { FastifyInstance } from "fastify";
 import {
   createUserHandler,
+  deleteUserByIdHandler,
   getAllUsersHandler,
   getUserByIdHandler,
-  updateUserById,
+  updateUserByIdHandler,
 } from "./users.controller";
 import {
   CreateUserSchema,
   GetAllUsersResponseSchema,
   GetUserByIdSchema,
+  UpdateUserSchema,
 } from "./users.schema";
 
 const usersRouter = async (fastify: FastifyInstance) => {
@@ -41,11 +43,18 @@ const usersRouter = async (fastify: FastifyInstance) => {
   fastify.patch(
     "/:userId",
     {
-      schema: {},
+      schema: UpdateUserSchema,
     },
-    updateUserById,
+    updateUserByIdHandler,
   );
   //DELETE BY ID
+  fastify.delete(
+    "/:userId",
+    {
+      schema: {},
+    },
+    deleteUserByIdHandler,
+  );
 };
 
 export default usersRouter;

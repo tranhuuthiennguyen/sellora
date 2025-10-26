@@ -1,18 +1,15 @@
-import {
-  FastifyReplyTypeBox,
-  FastifyRequestTypeBox,
-} from "@/schemas/common.schema";
-import { CreateUserSchema } from "./users.schema";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { ERRORS, handleServerError } from "@/helpers/errors.helper";
 import {
   checkEmailExists,
   createUser,
+  deleteUserById,
   getAllUsers,
   getUserById,
+  updateUserById,
 } from "./users.service";
 import { STANDARD } from "@/constants";
-import { CreateUser, UserType } from "./users.interface";
+import { CreateUser, UpdateUser, UserType } from "./users.interface";
 import { genSalt } from "@/utils/auth";
 
 export const getAllUsersHandler = async (
@@ -34,9 +31,7 @@ export const getAllUsersHandler = async (
 
 export const getUserByIdHandler = async (
   request: FastifyRequest<{
-    Params: {
-      userId: string;
-    };
+    Params: { userId: number };
   }>,
   reply: FastifyReply,
 ) => {
@@ -96,9 +91,59 @@ export const createUserHandler = async (
   }
 };
 
-export const updateUserById = async (
+export const updateUserByIdHandler = async (
   request: FastifyRequest<{
+    Params: { userId: number };
     Body: UserType;
   }>,
   reply: FastifyReply,
-) => {};
+) => {
+  const { userId } = request.params;
+  const body = request.body;
+
+  try {
+    const updatedUser = await updateUserById(request.server.db, userId, body);
+
+    if (!updatedUser) {
+      return reply.code(ERRORS.userNotExists.statusCode).send({
+        success: false,
+        message: ERRORS.userNotExists.message,
+      });
+    }
+
+    return reply.code(STANDARD.OK.statusCode).send({
+      success: true,
+      message: "UPDATED",
+      data: updatedUser,
+    });
+  } catch (error) {
+    return handleServerError(reply, error);
+  }
+};
+
+export const deleteUserByIdHandler = async (
+  request: FastifyRequest<{
+    Params: { userId: number };
+  }>,
+  reply: FastifyReply,
+) => {
+  try {
+    const { userId } = request.params;
+
+    const deletedId = await deleteUserById(request.server.db, userId);
+
+    if (!deletedId[0]) {
+      return reply.code(ERRORS.userNotExists.statusCode).send({
+        success: false,
+        message: ERRORS.userNotExists.message,
+      });
+    }
+
+    return reply.code(STANDARD.OK.statusCode).send({
+      success: true,
+      message: "USER_DELETED",
+    });
+  } catch (error) {
+    return handleServerError(reply, error);
+  }
+};

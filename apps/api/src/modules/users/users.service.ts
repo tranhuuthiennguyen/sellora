@@ -2,7 +2,7 @@ import { users } from "@/db/schema";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import * as schema from "@db/schema";
 import { eq, sql } from "drizzle-orm";
-import { UserType } from "./users.interface";
+import { UpdateUser, UserType } from "./users.interface";
 
 export const getAllUsers = async (db: PostgresJsDatabase<typeof schema>) => {
   const result = await db
@@ -55,4 +55,36 @@ export const checkEmailExists = async (
   email: string,
 ) => {
   return await db.selectDistinct().from(users).where(eq(users.email, email));
+};
+
+export const updateUserById = async (
+  db: PostgresJsDatabase<typeof schema>,
+  userId: number,
+  updates: Record<string, unknown>,
+) => {
+  const payload = {
+    ...updates,
+    updatedAt: new Date(),
+  };
+
+  const [updatedUser] = await db
+    .update(users)
+    .set(payload)
+    .where(eq(users.id, userId))
+    .returning();
+
+  return updatedUser ?? null;
+};
+
+export const deleteUserById = async (
+  db: PostgresJsDatabase<typeof schema>,
+  userId: number,
+) => {
+  try {
+    return await db.delete(users).where(eq(users.id, userId)).returning({
+      deletedId: users.id,
+    });
+  } catch (error) {
+    throw new Error("Drizzle error.");
+  }
 };

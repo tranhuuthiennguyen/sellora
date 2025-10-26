@@ -15,9 +15,6 @@ export const UserSchema = Type.Object({
 });
 
 export const GetUserByIdSchema: FastifySchema = {
-  params: Type.Object({
-    userId: Type.String(),
-  }),
   response: {
     200: Type.Intersect([
       BaseResponseSchema,
@@ -77,5 +74,11 @@ export const UpdateUserSchema: FastifySchema = {
         data: UserSchema,
       }),
     ]),
+  },
+};
+
+export const DeleteUserSchema: FastifySchema = {
+  response: {
+    200: BaseResponseSchema,
   },
 };

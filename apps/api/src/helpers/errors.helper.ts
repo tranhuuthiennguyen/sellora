@@ -19,6 +19,8 @@ export const ERRORS = {
 };
 
 export const handleServerError = (reply: FastifyReply, error: any) => {
+  reply.log.error(error);
+
   if (error instanceof AppError) {
     return reply.status(error.statusCode).send({ message: error.message });
   }
