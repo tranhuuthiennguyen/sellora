@@ -1,37 +1,28 @@
-export const responseProperty = {
-  message: {
-    type: "string",
+import { Type } from "@sinclair/typebox";
+
+export const STANDARD = {
+  OK: {
+    message: "OK",
+    statusCode: 200,
   },
-};
-
-export const ERROR400 = {
-  description: "Bad request",
-  type: "object",
-  properties: responseProperty,
-};
-
-export const ERROR401 = {
-  description: "Unauthorized",
-  type: "object",
-  properties: responseProperty,
-};
-
-export const ERROR403 = {
-  description: "Forbidden Request",
-  properties: responseProperty,
-};
-
-export const ERROR404 = {
-  description: "Not found",
-  properties: responseProperty,
-};
-
-export const ERROR409 = {
-  description: "Conflict",
-  properties: responseProperty,
-};
-
-export const ERROR500 = {
-  description: "Internal Sever Error",
-  properties: responseProperty,
-};
+  CREATE: {
+    message: "CREATED",
+    statusCode: 201,
+  },
+  ACCEPTED: {
+    message: "Accepted",
+    statusCode: 202,
+  },
+  NO_CONTENT: {
+    message: "No Content",
+    statusCode: 204,
+  },
+  RESET_CONTENT: {
+    message: "Reset Content",
+    statusCode: 205,
+  },
+  PARTIAL_CONTENT: {
+    message: "Partial Content",
+    statusCode: 206,
+  },
+} as const;

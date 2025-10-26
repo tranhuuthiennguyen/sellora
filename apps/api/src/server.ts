@@ -1,5 +1,6 @@
 import moduleAlias from "module-alias";
 
+// ugliest file entry ever
 moduleAlias.addAliases({
   "@": `${__dirname}`,
   "@config": `${__dirname}/config`,
@@ -9,13 +10,16 @@ moduleAlias.addAliases({
   "@plugins": `${__dirname}/plugins`,
   "@schemas": `${__dirname}/schemas`,
   "@utils": `${__dirname}/utils`,
-  "@types": `${__dirname}/types`,
+  "@helpers": `${__dirname}/helpers`,
 });
 
 import { buildApp } from "@/app";
+import { EnvSchema } from "@utils/validateEnv";
 
 const startServer = async () => {
   const app = await buildApp();
+
+  const { API_HOST, API_PORT } = app.getEnvs<typeof EnvSchema>();
 
   // Graceful shutdown
   const signals: NodeJS.Signals[] = ["SIGINT", "SIGTERM"];
@@ -35,8 +39,8 @@ const startServer = async () => {
   //start server
   try {
     await app.listen({
-      port: Number(app.config.API_PORT),
-      host: String(app.config.API_HOST),
+      port: Number(API_PORT),
+      host: String(API_HOST),
     });
   } catch (err) {
     app.log.error(err);

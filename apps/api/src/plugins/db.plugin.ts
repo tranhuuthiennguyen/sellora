@@ -3,11 +3,21 @@ import * as schema from "@db/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import { logger } from "@utils/logger";
+import { EnvSchema } from "@utils/validateEnv";
+import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+
+declare module "fastify" {
+  interface FastifyInstance {
+    db: PostgresJsDatabase<typeof schema>;
+  }
+}
 
 const dbPlugin = fp(
   async (fastify) => {
+    const { DATABASE_URL } = fastify.getEnvs<typeof EnvSchema>();
+
     const pool = await new Pool({
-      connectionString: fastify.config.DATABASE_URL,
+      connectionString: String(DATABASE_URL),
     })
       .connect()
       .then((client) => {

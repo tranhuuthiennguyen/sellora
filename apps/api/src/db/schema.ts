@@ -18,7 +18,7 @@ export const difficultyEnum = pgEnum("difficulty", [
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-  username: varchar("username", { length: 50 }).notNull(),
+  username: varchar("username", { length: 50 }),
   email: varchar("email", { length: 255 }).notNull().unique(),
   passwordHash: varchar("password_hash", { length: 255 }).notNull(),
   role: userRoleEnum("role").default("user").notNull(),

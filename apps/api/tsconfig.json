@@ -12,7 +12,7 @@
       "@plugins/*": ["plugins/*"],
       "@schemas/*": ["schemas/*"],
       "@utils/*": ["utils/*"],
-      "@types/*": ["types/*"]
+      "@helpers/*": ["helpers/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.json", ".env", "src/**/*.feature", "src/**/*.d.ts"],

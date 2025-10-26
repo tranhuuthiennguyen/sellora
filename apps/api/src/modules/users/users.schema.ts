@@ -1,9 +1,42 @@
-import { ERROR400, ERROR409, ERROR500, responseProperty } from "@/constants";
+import { BaseResponseSchema } from "@schemas/common.schema";
 import { Type } from "@sinclair/typebox";
 import { FastifySchema } from "fastify";
 
-export const CreateUserBody = Type.Object({
+export const UserSchema = Type.Object({
+  id: Type.Number(),
   username: Type.String(),
+  email: Type.String({
+    format: "email",
+    errorMessage: { format: "Invalid Email" },
+  }),
+  avatarUrl: Type.String(),
+  createdAt: Type.String({ format: "date-time" }),
+  updatedAt: Type.String({ format: "date-time" }),
+});
+
+export const GetUserByIdSchema: FastifySchema = {
+  response: {
+    200: Type.Intersect([
+      BaseResponseSchema,
+      Type.Object({
+        data: UserSchema,
+      }),
+    ]),
+  },
+};
+
+export const GetAllUsersResponseSchema: FastifySchema = {
+  response: {
+    200: Type.Intersect([
+      BaseResponseSchema,
+      Type.Object({
+        data: Type.Array(UserSchema),
+      }),
+    ]),
+  },
+};
+
+export const CreateUserBody = Type.Object({
   email: Type.String({
     format: "email",
     errorMessage: { format: "Invalid Email" },
@@ -21,23 +54,31 @@ export const CreateUserBody = Type.Object({
 export const CreateUserSchema: FastifySchema = {
   body: CreateUserBody,
   response: {
-    201: {
-      type: "object",
-      properties: {
-        ...responseProperty,
-        data: {
-          type: "object",
-          properties: {
-            username: { type: "string" },
-            email: { type: "string" },
-          },
-        },
-      },
-    },
-    400: ERROR400,
-    409: ERROR409,
-    500: ERROR500,
+    201: Type.Intersect([
+      BaseResponseSchema,
+      Type.Object({
+        data: UserSchema,
+      }),
+    ]),
   },
 };
 
-export const GetUserByIdSchema: FastifySchema = {};
+export const UpdateUserBody = Type.Partial(UserSchema);
+
+export const UpdateUserSchema: FastifySchema = {
+  body: UpdateUserBody,
+  response: {
+    200: Type.Intersect([
+      BaseResponseSchema,
+      Type.Object({
+        data: UserSchema,
+      }),
+    ]),
+  },
+};
+
+export const DeleteUserSchema: FastifySchema = {
+  response: {
+    200: BaseResponseSchema,
+  },
+};
