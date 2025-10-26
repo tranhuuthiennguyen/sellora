@@ -8,6 +8,7 @@ import { envOptions } from "@config";
 import fastifyEnv from "@fastify/env";
 import authRouter from "@/modules/auth/auth.router";
 import usersRouter from "./modules/users/users.router";
+import secureSession from "./plugins/secure-session";
 
 export async function buildApp() {
   const app = fastify({
@@ -22,9 +23,10 @@ export async function buildApp() {
     },
   }).withTypeProvider<TypeBoxTypeProvider>();
 
-  await app.register(fastifyEnv, envOptions);
-
+  //Register plugins
+  app.register(fastifyEnv, envOptions);
   app.register(dbPlugin);
+  app.register(secureSession);
 
   //Register middlewares
 
