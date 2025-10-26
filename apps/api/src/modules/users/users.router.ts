@@ -19,6 +19,7 @@ const usersRouter = async (fastify: FastifyInstance) => {
     "/",
     {
       schema: GetAllUsersResponseSchema,
+      preHandler: fastify.authenticateUser,
     },
     getAllUsersHandler,
   );

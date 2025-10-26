@@ -1,6 +1,6 @@
 import pino from "pino";
 import * as dotenv from "dotenv";
-import { envPath } from "@/config";
+import { envPath } from "@config";
 
 dotenv.config({ path: envPath });
 

@@ -1,8 +1,7 @@
-import { users } from "@/db/schema";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import { eq } from "drizzle-orm";
 import * as schema from "@db/schema";
-import { eq, sql } from "drizzle-orm";
-import { UpdateUser, UserType } from "./users.interface";
+import { users } from "@db/schema";
 
 export const getAllUsers = async (db: PostgresJsDatabase<typeof schema>) => {
   const result = await db
@@ -18,13 +17,13 @@ export const getUserById = async (
   db: PostgresJsDatabase<typeof schema>,
   userId: number,
 ) => {
-  const result = await db
-    .select()
-    .from(users)
-    .where(sql`${users.id} = ${userId}`)
-    .limit(1);
-
-  return result[0];
+  return await db.query.users.findFirst({
+    columns: {
+      passwordHash: false,
+      role: false,
+    },
+    where: eq(users.id, userId),
+  });
 };
 
 export const createUser = async (
@@ -54,7 +53,18 @@ export const checkEmailExists = async (
   db: PostgresJsDatabase<typeof schema>,
   email: string,
 ) => {
-  return await db.selectDistinct().from(users).where(eq(users.email, email));
+  return await db.query.users.findFirst({
+    where: eq(users.email, email),
+  });
+};
+
+export const checkUserExists = async (
+  db: PostgresJsDatabase<typeof schema>,
+  userId: number,
+) => {
+  return await db.query.users.findFirst({
+    where: eq(users.id, userId),
+  });
 };
 
 export const updateUserById = async (

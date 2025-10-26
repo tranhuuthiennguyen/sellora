@@ -1,5 +1,15 @@
 import * as bcrypt from "bcrypt";
 
+declare module "@fastify/secure-session" {
+  interface SessionData {
+    authUser: {
+      id: number;
+      email: string;
+      role: "user" | "admin" | "moderator";
+    };
+  }
+}
+
 export const genSalt = (saltRounds: number, value: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     bcrypt.genSalt(saltRounds, (err, salt) => {
@@ -12,7 +22,7 @@ export const genSalt = (saltRounds: number, value: string): Promise<string> => {
   });
 };
 
-export const compareHash = (hash: string, value: string): Promise<boolean> => {
+export const compareHash = (value: string, hash: string): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     bcrypt.compare(value, hash, (err, result) => {
       if (err) return reject(err);

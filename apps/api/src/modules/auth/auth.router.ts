@@ -1,6 +1,7 @@
-import { FastifyInstance, FastifyPluginOptions } from "fastify";
+import { FastifyInstance } from "fastify";
 import { CreateUserSchema } from "../users/users.schema";
-import { register } from "./auth.controller";
+import { loginHandler, registerHandler } from "./auth.controller";
+import { LoginSchema } from "./auth.schema";
 
 const authRouter = async (fastify: FastifyInstance) => {
   // REGISTER
@@ -9,8 +10,17 @@ const authRouter = async (fastify: FastifyInstance) => {
     {
       schema: CreateUserSchema,
     },
-    register,
+    registerHandler,
   );
+  // LOGIN
+  fastify.post(
+    "/login",
+    {
+      schema: LoginSchema,
+    },
+    loginHandler,
+  );
+  // LOGOUT
 };
 
 export default authRouter;

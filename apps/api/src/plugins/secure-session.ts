@@ -9,7 +9,7 @@ export default fp(async (fastify: FastifyInstance) => {
 
   if (!fs.existsSync(keyPath)) {
     fastify.log.error("Missing session secret key file. Run:");
-    fastify.log.error("npx --yes @fastify/secure-session > secret-key");
+    fastify.log.error("npx --yes @fastify/secure-session > secret-key.key");
     throw new Error("Session secret key file not found.");
   }
 

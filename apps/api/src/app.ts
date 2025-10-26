@@ -1,14 +1,15 @@
 import fastify from "fastify";
-import { logger } from "@utils/logger";
-import dbPlugin from "@plugins/db.plugin";
-import { schemaErrorFormatter } from "@utils/schemaErrorFormatter";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import ajvErrors from "ajv-errors";
 import { envOptions } from "@config";
 import fastifyEnv from "@fastify/env";
-import authRouter from "@/modules/auth/auth.router";
-import usersRouter from "./modules/users/users.router";
-import secureSession from "./plugins/secure-session";
+import authRouter from "@modules/auth/auth.router";
+import usersRouter from "@modules/users/users.router";
+import dbPlugin from "@plugins/db";
+import secureSession from "@plugins/secure-session";
+import auth from "@plugins/auth";
+import { logger } from "@utils/logger";
+import { schemaErrorFormatter } from "@utils/schemaErrorFormatter";
 
 export async function buildApp() {
   const app = fastify({
@@ -27,6 +28,7 @@ export async function buildApp() {
   app.register(fastifyEnv, envOptions);
   app.register(dbPlugin);
   app.register(secureSession);
+  app.register(auth);
 
   //Register middlewares
 

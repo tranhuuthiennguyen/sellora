@@ -1,10 +1,10 @@
 import fp from "fastify-plugin";
-import * as schema from "@db/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
+import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { Pool } from "pg";
 import { logger } from "@utils/logger";
 import { EnvSchema } from "@utils/validateEnv";
-import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import * as schema from "@db/schema";
 
 declare module "fastify" {
   interface FastifyInstance {

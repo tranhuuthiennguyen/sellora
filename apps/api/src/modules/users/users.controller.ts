@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { ERRORS, handleServerError } from "@/helpers/errors.helper";
+import { ERRORS, handleServerError } from "@helpers/errors.helper";
 import {
   checkEmailExists,
   createUser,
@@ -9,8 +9,8 @@ import {
   updateUserById,
 } from "./users.service";
 import { STANDARD } from "@/constants";
-import { CreateUser, UpdateUser, UserType } from "./users.interface";
-import { genSalt } from "@/utils/auth";
+import { CreateUser, UserType } from "./users.interface";
+import { genSalt } from "@utils/auth";
 
 export const getAllUsersHandler = async (
   request: FastifyRequest,
@@ -71,8 +71,8 @@ export const createUserHandler = async (
       });
     }
     // check email exists
-    const isEmailExisted = await checkEmailExists(request.server.db, email);
-    if (isEmailExisted[0]) {
+    const user = await checkEmailExists(request.server.db, email);
+    if (user) {
       return reply
         .code(ERRORS.userExists.statusCode)
         .send(ERRORS.userExists.message);
