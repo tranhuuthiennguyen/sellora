@@ -1,8 +1,7 @@
-import { users } from "@/db/schema";
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import { eq } from "drizzle-orm";
 import * as schema from "@db/schema";
-import { eq, sql } from "drizzle-orm";
-import { UpdateUser, UserType } from "./users.interface";
+import { users } from "@db/schema";
 
 export const getAllUsers = async (db: PostgresJsDatabase<typeof schema>) => {
   const result = await db
@@ -18,13 +17,13 @@ export const getUserById = async (
   db: PostgresJsDatabase<typeof schema>,
   userId: number,
 ) => {
-  const result = await db
-    .select()
-    .from(users)
-    .where(sql`${users.id} = ${userId}`)
-    .limit(1);
-
-  return result[0];
+  return await db.query.users.findFirst({
+    columns: {
+      passwordHash: false,
+      role: false,
+    },
+    where: eq(users.id, userId),
+  });
 };
 
 export const createUser = async (
@@ -42,6 +41,7 @@ export const createUser = async (
       id: users.id,
       username: users.username,
       email: users.email,
+      role: users.role,
       avatarUrl: users.avatarUrl,
       createdAt: users.createdAt,
       updatedAt: users.updatedAt,
@@ -50,11 +50,21 @@ export const createUser = async (
   return result[0];
 };
 
-export const checkEmailExists = async (
+export const checkUserExists = async (
   db: PostgresJsDatabase<typeof schema>,
-  email: string,
+  params: { userId?: number; email?: string },
 ) => {
-  return await db.selectDistinct().from(users).where(eq(users.email, email));
+  if (!params.userId && !params.email) {
+    throw new Error("Either email or userId must be provided");
+  }
+
+  const condition = params.userId
+    ? eq(users.id, params.userId)
+    : eq(users.email, params.email!);
+
+  return await db.query.users.findFirst({
+    where: condition,
+  });
 };
 
 export const updateUserById = async (
@@ -81,10 +91,8 @@ export const deleteUserById = async (
   userId: number,
 ) => {
   try {
-    return await db.delete(users).where(eq(users.id, userId)).returning({
-      deletedId: users.id,
-    });
+    return await db.delete(users).where(eq(users.id, userId)).returning();
   } catch (error) {
-    throw new Error("Drizzle error.");
+    throw new Error(`Drizzle Error: ${error}`);
   }
 };

@@ -15,46 +15,35 @@ import {
 
 const usersRouter = async (fastify: FastifyInstance) => {
   //GET ALL
-  fastify.get(
-    "/",
-    {
-      schema: GetAllUsersResponseSchema,
-    },
-    getAllUsersHandler,
-  );
+  fastify.get("/", {
+    schema: GetAllUsersResponseSchema,
+    preHandler: fastify.authenticateUser,
+    handler: getAllUsersHandler,
+  });
 
   //GET BY ID
-  fastify.get(
-    "/:userId",
-    {
-      schema: GetUserByIdSchema,
-    },
-    getUserByIdHandler,
-  );
+  fastify.get("/:userId", {
+    schema: GetUserByIdSchema,
+    preHandler: fastify.authenticateUser,
+    handler: getUserByIdHandler,
+  });
   //CREATE USER
-  fastify.post(
-    "/",
-    {
-      schema: CreateUserSchema,
-    },
-    createUserHandler,
-  );
+  fastify.post("/", {
+    schema: CreateUserSchema,
+    preHandler: fastify.authenticateUser,
+    handler: createUserHandler,
+  });
   //UPDATE BY ID
-  fastify.patch(
-    "/:userId",
-    {
-      schema: UpdateUserSchema,
-    },
-    updateUserByIdHandler,
-  );
+  fastify.patch("/:userId", {
+    schema: UpdateUserSchema,
+    preHandler: fastify.authenticateUser,
+    handler: updateUserByIdHandler,
+  });
   //DELETE BY ID
-  fastify.delete(
-    "/:userId",
-    {
-      schema: {},
-    },
-    deleteUserByIdHandler,
-  );
+  fastify.delete("/:userId", {
+    preHandler: fastify.authenticateUser,
+    handler: deleteUserByIdHandler,
+  });
 };
 
 export default usersRouter;
