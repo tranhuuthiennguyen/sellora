@@ -3,6 +3,7 @@ import fp from "fastify-plugin";
 import { UserType } from "@modules/users/users.interface";
 import { ERRORS, handleServerError } from "@helpers/errors.helper";
 import { getUserById } from "@modules/users/users.service";
+import { sendError } from "@/utils/response";
 
 declare module "fastify" {
   interface FastifyInstance {
@@ -29,8 +30,8 @@ export default fp((fastify: FastifyInstance, _: unknown, done: () => void) => {
 
       if (!user) {
         request.log.warn("Unauthorized: no user session found");
-        return reply.code(ERRORS.unauthorizedAccess.statusCode).send({
-          success: false,
+        return sendError(reply, {
+          statusCode: ERRORS.unauthorizedAccess.statusCode,
           message: ERRORS.unauthorizedAccess.message,
         });
       }
@@ -40,8 +41,8 @@ export default fp((fastify: FastifyInstance, _: unknown, done: () => void) => {
       if (!userData) {
         request.log.warn("Unauthorized: user not found");
         request.session.delete();
-        return reply.code(ERRORS.unauthorizedAccess.statusCode).send({
-          success: false,
+        return sendError(reply, {
+          statusCode: ERRORS.unauthorizedAccess.statusCode,
           message: ERRORS.unauthorizedAccess.message,
         });
       }

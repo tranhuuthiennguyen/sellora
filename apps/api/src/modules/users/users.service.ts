@@ -41,6 +41,7 @@ export const createUser = async (
       id: users.id,
       username: users.username,
       email: users.email,
+      role: users.role,
       avatarUrl: users.avatarUrl,
       createdAt: users.createdAt,
       updatedAt: users.updatedAt,
@@ -49,21 +50,20 @@ export const createUser = async (
   return result[0];
 };
 
-export const checkEmailExists = async (
-  db: PostgresJsDatabase<typeof schema>,
-  email: string,
-) => {
-  return await db.query.users.findFirst({
-    where: eq(users.email, email),
-  });
-};
-
 export const checkUserExists = async (
   db: PostgresJsDatabase<typeof schema>,
-  userId: number,
+  params: { userId?: number; email?: string },
 ) => {
+  if (!params.userId && !params.email) {
+    throw new Error("Either email or userId must be provided");
+  }
+
+  const condition = params.userId
+    ? eq(users.id, params.userId)
+    : eq(users.email, params.email!);
+
   return await db.query.users.findFirst({
-    where: eq(users.id, userId),
+    where: condition,
   });
 };
 
@@ -91,10 +91,8 @@ export const deleteUserById = async (
   userId: number,
 ) => {
   try {
-    return await db.delete(users).where(eq(users.id, userId)).returning({
-      deletedId: users.id,
-    });
+    return await db.delete(users).where(eq(users.id, userId)).returning();
   } catch (error) {
-    throw new Error("Drizzle error.");
+    throw new Error(`Drizzle Error: ${error}`);
   }
 };

@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { ERRORS, handleServerError } from "@helpers/errors.helper";
 import {
-  checkEmailExists,
+  checkUserExists,
   createUser,
   deleteUserById,
   getAllUsers,
@@ -11,6 +11,7 @@ import {
 import { STANDARD } from "@/constants";
 import { CreateUser, UserType } from "./users.interface";
 import { genSalt } from "@utils/auth";
+import { sendError, sendSuccess } from "@utils/response";
 
 export const getAllUsersHandler = async (
   request: FastifyRequest,
@@ -19,8 +20,8 @@ export const getAllUsersHandler = async (
   try {
     const users = await getAllUsers(request.server.db);
 
-    return reply.code(STANDARD.OK.statusCode).send({
-      success: true,
+    return sendSuccess(reply, {
+      statusCode: STANDARD.OK.statusCode,
       message: STANDARD.OK.message,
       data: users,
     });
@@ -41,13 +42,14 @@ export const getUserByIdHandler = async (
     const user = await getUserById(request.server.db, Number(userId));
 
     if (!user) {
-      return reply
-        .code(ERRORS.userNotExists.statusCode)
-        .send(ERRORS.userNotExists.message);
+      return sendError(reply, {
+        statusCode: ERRORS.userNotExists.statusCode,
+        message: ERRORS.userNotExists.message,
+      });
     }
 
-    return reply.code(STANDARD.OK.statusCode).send({
-      success: true,
+    return sendSuccess(reply, {
+      statusCode: STANDARD.OK.statusCode,
       message: STANDARD.OK.message,
       data: user,
     });
@@ -70,19 +72,20 @@ export const createUserHandler = async (
         message: "Email and password must be provided.",
       });
     }
-    // check email exists
-    const user = await checkEmailExists(request.server.db, email);
+    // check user exists
+    const user = await checkUserExists(request.server.db, { email });
     if (user) {
-      return reply
-        .code(ERRORS.userExists.statusCode)
-        .send(ERRORS.userExists.message);
+      return sendError(reply, {
+        statusCode: ERRORS.userExists.statusCode,
+        message: ERRORS.userExists.message,
+      });
     }
 
     const hashPwd = await genSalt(10, password);
     const createdUser = await createUser(request.server.db, email, hashPwd);
 
-    return reply.code(STANDARD.CREATE.statusCode).send({
-      success: true,
+    return sendSuccess(reply, {
+      statusCode: STANDARD.CREATE.statusCode,
       message: STANDARD.CREATE.message,
       data: createdUser,
     });
@@ -105,15 +108,15 @@ export const updateUserByIdHandler = async (
     const updatedUser = await updateUserById(request.server.db, userId, body);
 
     if (!updatedUser) {
-      return reply.code(ERRORS.userNotExists.statusCode).send({
-        success: false,
+      return sendError(reply, {
+        statusCode: ERRORS.userNotExists.statusCode,
         message: ERRORS.userNotExists.message,
       });
     }
 
-    return reply.code(STANDARD.OK.statusCode).send({
-      success: true,
-      message: "UPDATED",
+    return sendSuccess(reply, {
+      statusCode: STANDARD.OK.statusCode,
+      message: "USER_DATA_UPDATED",
       data: updatedUser,
     });
   } catch (error) {
@@ -133,14 +136,14 @@ export const deleteUserByIdHandler = async (
     const deletedId = await deleteUserById(request.server.db, userId);
 
     if (!deletedId[0]) {
-      return reply.code(ERRORS.userNotExists.statusCode).send({
-        success: false,
+      return sendError(reply, {
+        statusCode: ERRORS.userNotExists.statusCode,
         message: ERRORS.userNotExists.message,
       });
     }
 
-    return reply.code(STANDARD.OK.statusCode).send({
-      success: true,
+    return sendSuccess(reply, {
+      statusCode: STANDARD.OK.statusCode,
       message: "USER_DELETED",
     });
   } catch (error) {

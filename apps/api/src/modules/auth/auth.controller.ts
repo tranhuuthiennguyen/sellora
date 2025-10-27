@@ -1,15 +1,53 @@
-import { ERRORS, handleServerError } from "@helpers/errors.helper";
 import { FastifyReply, FastifyRequest } from "fastify";
-import { CreateUser } from "../users/users.interface";
-import { checkEmailExists } from "../users/users.service";
-import { compareHash } from "@utils/auth";
+import { ERRORS, handleServerError } from "@helpers/errors.helper";
+import { CreateUser } from "@modules/users/users.interface";
+import { checkUserExists, createUser } from "@modules/users/users.service";
+import { compareHash, genSalt } from "@utils/auth";
 import { STANDARD } from "@/constants";
+import { sendError, sendSuccess } from "@utils/response";
 
 export const registerHandler = async (
-  request: FastifyRequest,
+  request: FastifyRequest<{
+    Body: CreateUser;
+  }>,
   reply: FastifyReply,
 ) => {
+  const { email, password } = request.body;
+  if (!email || !password) {
+    return reply.code(400).send({
+      message: "Email and password must be provided.",
+    });
+  }
   try {
+    const user = await checkUserExists(request.server.db, { email });
+    if (user) {
+      return sendError(reply, {
+        statusCode: ERRORS.userExists.statusCode,
+        message: ERRORS.userExists.message,
+      });
+    }
+
+    const hashPwd = await genSalt(10, password);
+    const createdUser = await createUser(request.server.db, email, hashPwd);
+
+    if (!createdUser) {
+      return sendError(reply, {
+        statusCode: ERRORS.internalServerError.statusCode,
+        message: ERRORS.internalServerError.message,
+      });
+    }
+
+    request.session.set("authUser", {
+      id: createdUser.id,
+      email: createdUser.email,
+      role: createdUser.role,
+    });
+
+    return sendSuccess(reply, {
+      statusCode: STANDARD.CREATE.statusCode,
+      message: STANDARD.CREATE.message,
+      data: createdUser,
+    });
   } catch (error) {
     return handleServerError(reply, error);
   }
@@ -26,11 +64,11 @@ export const loginHandler = async (
       email: string;
       password: string;
     };
-    const user = await checkEmailExists(request.server.db, email);
+    const user = await checkUserExists(request.server.db, { email });
     if (!user) {
       request.log.error(`User with email ${email} doesn't exist.`);
-      return reply.code(ERRORS.userNotExists.statusCode).send({
-        success: false,
+      return sendError(reply, {
+        statusCode: ERRORS.userNotExists.statusCode,
         message: ERRORS.userNotExists.message,
       });
     }
@@ -39,8 +77,8 @@ export const loginHandler = async (
 
     if (!checkPassword) {
       request.log.error(`Wrong password for email ${email}`);
-      return reply.code(ERRORS.userCredError.statusCode).send({
-        success: false,
+      return sendError(reply, {
+        statusCode: ERRORS.userCredError.statusCode,
         message: ERRORS.userCredError.message,
       });
     }
@@ -51,9 +89,9 @@ export const loginHandler = async (
       role: user.role,
     });
 
-    return reply.code(STANDARD.OK.statusCode).send({
-      success: true,
-      message: "USER_LOGIN_SUCCESSFULLY",
+    return sendSuccess(reply, {
+      statusCode: STANDARD.OK.statusCode,
+      message: "USER_LOGGED_IN",
       data: user,
     });
   } catch (error) {
@@ -66,6 +104,12 @@ export const logoutHandler = async (
   reply: FastifyReply,
 ) => {
   try {
+    request.session.delete();
+    request.log.debug("User has logged out.");
+    return sendSuccess(reply, {
+      statusCode: STANDARD.OK.statusCode,
+      message: "USER_LOGOUT_SUCCESSFULLY",
+    });
   } catch (error) {
     return handleServerError(reply, error);
   }

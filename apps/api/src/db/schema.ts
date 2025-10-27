@@ -54,7 +54,7 @@ export const decks = pgTable("decks", {
     .references(() => categories.id),
   userId: integer("user_id")
     .notNull()
-    .references(() => users.id),
+    .references(() => users.id, { onDelete: "cascade" }),
   title: varchar("title", { length: 150 }).notNull(),
   description: text("description"),
   difficulty: difficultyEnum("difficulty").default("beginner").notNull(),
