@@ -1,6 +1,6 @@
-# Quizzer (React + Fastify + Postgres)
+# Sellora (React + Fastify + Postgres)
 
-Quizzer is an enhance version of Quizlet built with React and Fastify
+Sellora is an alternative to Gumroad built with React and Fastify
 
 ## Todo
 
