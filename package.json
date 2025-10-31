@@ -1,5 +1,5 @@
 {
-  "name": "quizzer",
+  "name": "sellora",
   "private": true,
   "scripts": {
     "build": "turbo run build",
