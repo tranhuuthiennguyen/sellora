@@ -2,11 +2,8 @@ import { Pool } from "pg";
 import * as dotenv from "dotenv";
 import { drizzle } from "drizzle-orm/node-postgres";
 import * as schema from "@db/schema";
-import { seedUsers } from "./users";
 import { reset } from "drizzle-seed";
-import { seedCategories } from "./categories";
-import { seedDecks } from "./decks";
-import { seedCards } from "./cards";
+import { seedUsers } from "./users";
 dotenv.config();
 
 const main = async () => {
@@ -19,9 +16,6 @@ const main = async () => {
   await reset(db, schema);
 
   await seedUsers(db, 10);
-  await seedCategories(db);
-  await seedDecks(db, 20);
-  await seedCards(db, 40);
 
   client.end();
 };

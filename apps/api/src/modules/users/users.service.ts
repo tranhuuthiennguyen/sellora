@@ -2,6 +2,7 @@ import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { eq } from "drizzle-orm";
 import * as schema from "@db/schema";
 import { users } from "@db/schema";
+import { CreateUser } from "./users.interface";
 
 export const getAllUsers = async (db: PostgresJsDatabase<typeof schema>) => {
   const result = await db
@@ -20,7 +21,6 @@ export const getUserById = async (
   return await db.query.users.findFirst({
     columns: {
       passwordHash: false,
-      role: false,
     },
     where: eq(users.id, userId),
   });
@@ -28,21 +28,27 @@ export const getUserById = async (
 
 export const createUser = async (
   db: PostgresJsDatabase<typeof schema>,
-  email: string,
-  passwordHash: string,
+  payload: {
+    email: string;
+    passwordHash: string;
+    username: string;
+    currencyType: string;
+  },
 ) => {
+  const { email, passwordHash, username, currencyType } = payload;
   const result = await db
     .insert(users)
     .values({
-      email: email.trim(),
-      passwordHash: passwordHash.trim(),
+      email: email,
+      passwordHash: passwordHash,
+      username: username,
+      currencyType: currencyType,
     })
     .returning({
       id: users.id,
       username: users.username,
       email: users.email,
-      role: users.role,
-      avatarUrl: users.avatarUrl,
+      profilePictureUrl: users.profilePictureUrl,
       createdAt: users.createdAt,
       updatedAt: users.updatedAt,
     });

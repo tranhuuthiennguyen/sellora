@@ -1,13 +1,11 @@
 import { FastifyInstance } from "fastify";
 import {
-  createUserHandler,
   deleteUserByIdHandler,
   getAllUsersHandler,
   getUserByIdHandler,
   updateUserByIdHandler,
 } from "./users.controller";
 import {
-  CreateUserSchema,
   GetAllUsersResponseSchema,
   GetUserByIdSchema,
   UpdateUserSchema,
@@ -26,12 +24,6 @@ const usersRouter = async (fastify: FastifyInstance) => {
     schema: GetUserByIdSchema,
     preHandler: fastify.authenticateUser,
     handler: getUserByIdHandler,
-  });
-  //CREATE USER
-  fastify.post("/", {
-    schema: CreateUserSchema,
-    preHandler: fastify.authenticateUser,
-    handler: createUserHandler,
   });
   //UPDATE BY ID
   fastify.patch("/:userId", {

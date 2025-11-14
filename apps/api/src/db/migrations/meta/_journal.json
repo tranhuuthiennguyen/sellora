@@ -5,43 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1760004336399,
-      "tag": "0000_wild_odin",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1760364896747,
-      "tag": "0001_overconfident_warstar",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1760366061589,
-      "tag": "0002_youthful_mysterio",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1760525720049,
-      "tag": "0003_old_hitman",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1761302100600,
-      "tag": "0004_bizarre_argent",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1761561456537,
-      "tag": "0005_third_omega_red",
+      "when": 1763119837194,
+      "tag": "0000_ini",
       "breakpoints": true
     }
   ]

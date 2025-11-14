@@ -4,7 +4,10 @@ import { CreateUserBody, UserSchema } from "../users/users.schema";
 import { BaseResponseSchema } from "@schemas/common.schema";
 
 export const LoginSchema: FastifySchema = {
-  body: CreateUserBody,
+  body: Type.Object({
+    email: Type.String(),
+    password: Type.String(),
+  }),
   response: {
     200: Type.Intersect([
       BaseResponseSchema,

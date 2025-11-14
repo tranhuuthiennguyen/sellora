@@ -58,42 +58,6 @@ export const getUserByIdHandler = async (
   }
 };
 
-export const createUserHandler = async (
-  request: FastifyRequest<{
-    Body: CreateUser;
-  }>,
-  reply: FastifyReply,
-) => {
-  try {
-    const { email, password } = request.body;
-    // email & pwd must be provided
-    if (!email || !password) {
-      return reply.code(400).send({
-        message: "Email and password must be provided.",
-      });
-    }
-    // check user exists
-    const user = await checkUserExists(request.server.db, { email });
-    if (user) {
-      return sendError(reply, {
-        statusCode: ERRORS.userExists.statusCode,
-        message: ERRORS.userExists.message,
-      });
-    }
-
-    const hashPwd = await genSalt(10, password);
-    const createdUser = await createUser(request.server.db, email, hashPwd);
-
-    return sendSuccess(reply, {
-      statusCode: STANDARD.CREATE.statusCode,
-      message: STANDARD.CREATE.message,
-      data: createdUser,
-    });
-  } catch (error) {
-    return handleServerError(reply, error);
-  }
-};
-
 export const updateUserByIdHandler = async (
   request: FastifyRequest<{
     Params: { userId: number };

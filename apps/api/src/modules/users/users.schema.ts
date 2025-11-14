@@ -4,12 +4,20 @@ import { FastifySchema } from "fastify";
 
 export const UserSchema = Type.Object({
   id: Type.Number(),
-  username: Type.String(),
   email: Type.String({
     format: "email",
     errorMessage: { format: "Invalid Email" },
   }),
-  avatarUrl: Type.String(),
+  username: Type.String(),
+  displayName: Type.String(),
+  bio: Type.String(),
+  currencyType: Type.String(),
+  profilePictureUrl: Type.String(),
+  country: Type.String(),
+  state: Type.String(),
+  city: Type.String(),
+  zipCode: Type.String(),
+  streetAddress: Type.String(),
   createdAt: Type.String({ format: "date-time" }),
   updatedAt: Type.String({ format: "date-time" }),
 });
@@ -49,6 +57,8 @@ export const CreateUserBody = Type.Object({
         "password must minimum of 8 characters, 1 uppercase, lowercase, number and a special character",
     },
   }),
+  username: Type.String(),
+  currencyType: Type.String(),
 });
 
 export const CreateUserSchema: FastifySchema = {
