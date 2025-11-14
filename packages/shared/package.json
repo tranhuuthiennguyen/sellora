@@ -1,0 +1,12 @@
+{
+  "name": "@sellora/shared",
+  "version": "1.0.0",
+  "description": "shared package",
+  "license": "ISC",
+  "author": "thien",
+  "type": "commonjs",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}

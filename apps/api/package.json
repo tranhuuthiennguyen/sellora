@@ -8,6 +8,7 @@
     "dev": "nodemon",
     "generate": "npx drizzle-kit generate --config=src/db/drizzle.config.ts",
     "migrate": "npx drizzle-kit migrate --config=src/db/drizzle.config.ts",
+    "push": "npx drizzle-kit push --config=src/db/drizzle.config.ts",
     "seed": "tsx ./src/db/seed/index.ts"
   },
   "keywords": [],
@@ -33,8 +34,8 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^10.0.0",
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
+    "@sellora/eslint-config": "^0.0.0",
+    "@sellora/typescript-config": "^0.0.0",
     "@types/bcrypt": "^6.0.0",
     "@types/module-alias": "^2.0.4",
     "@types/node": "^22.18.8",

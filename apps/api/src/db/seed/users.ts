@@ -14,11 +14,18 @@ export const seedUsers = async (
     const passwordHash = await bcrypt.hash(password, 10);
     const createdAt = faker.date.past({ years: 2 });
     data.push({
-      username: faker.internet.username(),
       email: faker.internet.email(),
       passwordHash: passwordHash,
-      role: "user",
-      avatarUrl: null,
+      username: faker.internet.username(),
+      displayName: faker.internet.displayName(),
+      bio: faker.lorem.paragraph(),
+      currencyType: faker.finance.currencyCode(),
+      profilePictureUrl: null,
+      country: faker.location.country(),
+      state: faker.location.state(),
+      city: faker.location.city(),
+      zipCode: faker.location.zipCode(),
+      streetAddress: faker.location.streetAddress(true),
       createdAt: createdAt,
       updatedAt: faker.date.between({ from: createdAt, to: new Date() }),
     });

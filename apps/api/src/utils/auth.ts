@@ -5,7 +5,6 @@ declare module "@fastify/secure-session" {
     authUser: {
       id: number;
       email: string;
-      role: "user" | "admin" | "moderator";
     };
   }
 }

@@ -13,6 +13,16 @@ services:
     networks:
       - backend
 
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - backend
+    environment:
+          ADMINER_DEFAULT_SERVER: db
+
   # api:
   #   build:
   #     dockerfile: ./apps/api/Dockerfile

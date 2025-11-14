@@ -12,10 +12,10 @@ export const registerHandler = async (
   }>,
   reply: FastifyReply,
 ) => {
-  const { email, password } = request.body;
-  if (!email || !password) {
+  const { email, password, username, currencyType } = request.body;
+  if (!email || !password || !username || !currencyType) {
     return reply.code(400).send({
-      message: "Email and password must be provided.",
+      message: "Email, password, username and currency type must be provided.",
     });
   }
   try {
@@ -28,7 +28,14 @@ export const registerHandler = async (
     }
 
     const hashPwd = await genSalt(10, password);
-    const createdUser = await createUser(request.server.db, email, hashPwd);
+
+    const payload = {
+      email: email,
+      passwordHash: hashPwd,
+      username: username,
+      currencyType: currencyType,
+    };
+    const createdUser = await createUser(request.server.db, payload);
 
     if (!createdUser) {
       return sendError(reply, {
@@ -40,7 +47,6 @@ export const registerHandler = async (
     request.session.set("authUser", {
       id: createdUser.id,
       email: createdUser.email,
-      role: createdUser.role,
     });
 
     return sendSuccess(reply, {
@@ -86,7 +92,6 @@ export const loginHandler = async (
     request.session.set("authUser", {
       id: user.id,
       email: user.email,
-      role: user.role,
     });
 
     return sendSuccess(reply, {
