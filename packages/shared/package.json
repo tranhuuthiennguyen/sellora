@@ -4,9 +4,37 @@
   "description": "shared package",
   "license": "ISC",
   "author": "thien",
-  "type": "commonjs",
-  "main": "index.ts",
+  "private": "true",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "tsc -b -v --watch",
+    "build": "tsc -b -v"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "./dist/**"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./*": {
+      "import": "./dist/*.js",
+      "require": "./dist/*.js"
+    }
+  },
+  "dependencies": {
+    "@sinclair/typebox": "^0.34.41"
+  },
+  "devDependencies": {
+    "@sellora/eslint-config": "*",
+    "@sellora/typescript-config": "*",
+    "@types/node": "^22.15.3",
+    "eslint": "^9.34.0",
+    "typescript": "5.9.2"
   }
 }

@@ -1,17 +1,23 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { ERRORS, handleServerError } from "@helpers/errors.helper";
 import {
-  checkUserExists,
-  createUser,
   deleteUserById,
   getAllUsers,
   getUserById,
   updateUserById,
 } from "./users.service";
 import { STANDARD } from "@/constants";
-import { CreateUser, UserType } from "./users.interface";
-import { genSalt } from "@utils/auth";
+import type { UserEntity } from "@sellora/shared";
 import { sendError, sendSuccess } from "@utils/response";
+import {
+  FastifyReplyTypeBox,
+  FastifyRequestTypeBox,
+} from "@/schemas/common.schema";
+import {
+  DeleteUserSchema,
+  GetUserByIdSchema,
+  UpdateUserSchema,
+} from "@modules/users/users.schema";
 
 export const getAllUsersHandler = async (
   request: FastifyRequest,
@@ -20,10 +26,9 @@ export const getAllUsersHandler = async (
   try {
     const users = await getAllUsers(request.server.db);
 
-    return sendSuccess(reply, {
-      statusCode: STANDARD.OK.statusCode,
-      message: STANDARD.OK.message,
-      data: users,
+    return reply.code(200).send({
+      success: true,
+      users: users,
     });
   } catch (error) {
     return handleServerError(reply, error);
@@ -31,27 +36,27 @@ export const getAllUsersHandler = async (
 };
 
 export const getUserByIdHandler = async (
-  request: FastifyRequest<{
-    Params: { userId: number };
-  }>,
-  reply: FastifyReply,
+  request: FastifyRequestTypeBox<typeof GetUserByIdSchema>,
+  reply: FastifyReplyTypeBox<typeof GetUserByIdSchema>,
 ) => {
   try {
-    const { userId } = request.params;
+    const { userId } = request.params as { userId: number };
 
-    const user = await getUserById(request.server.db, Number(userId));
+    const user = (await getUserById(
+      request.server.db,
+      userId,
+    )) as unknown as UserEntity;
 
     if (!user) {
-      return sendError(reply, {
-        statusCode: ERRORS.userNotExists.statusCode,
+      return reply.code(404).send({
+        success: false,
         message: ERRORS.userNotExists.message,
       });
     }
 
-    return sendSuccess(reply, {
-      statusCode: STANDARD.OK.statusCode,
-      message: STANDARD.OK.message,
-      data: user,
+    return reply.code(200).send({
+      success: true,
+      user: user,
     });
   } catch (error) {
     return handleServerError(reply, error);
@@ -59,29 +64,25 @@ export const getUserByIdHandler = async (
 };
 
 export const updateUserByIdHandler = async (
-  request: FastifyRequest<{
-    Params: { userId: number };
-    Body: UserType;
-  }>,
-  reply: FastifyReply,
+  request: FastifyRequestTypeBox<typeof UpdateUserSchema>,
+  reply: FastifyReplyTypeBox<typeof UpdateUserSchema>,
 ) => {
-  const { userId } = request.params;
-  const body = request.body;
+  const { userId } = request.params as { userId: number };
+  const body = request.body as UserEntity;
 
   try {
     const updatedUser = await updateUserById(request.server.db, userId, body);
 
     if (!updatedUser) {
-      return sendError(reply, {
-        statusCode: ERRORS.userNotExists.statusCode,
+      return reply.code(404).send({
+        success: false,
         message: ERRORS.userNotExists.message,
       });
     }
 
-    return sendSuccess(reply, {
-      statusCode: STANDARD.OK.statusCode,
-      message: "USER_DATA_UPDATED",
-      data: updatedUser,
+    return reply.code(200).send({
+      success: true,
+      user: updatedUser,
     });
   } catch (error) {
     return handleServerError(reply, error);
@@ -89,26 +90,24 @@ export const updateUserByIdHandler = async (
 };
 
 export const deleteUserByIdHandler = async (
-  request: FastifyRequest<{
-    Params: { userId: number };
-  }>,
-  reply: FastifyReply,
+  request: FastifyRequestTypeBox<typeof DeleteUserSchema>,
+  reply: FastifyReplyTypeBox<typeof DeleteUserSchema>,
 ) => {
   try {
-    const { userId } = request.params;
+    const { userId } = request.params as { userId: number };
 
     const deletedId = await deleteUserById(request.server.db, userId);
 
     if (!deletedId[0]) {
-      return sendError(reply, {
-        statusCode: ERRORS.userNotExists.statusCode,
+      return reply.code(404).send({
+        success: false,
         message: ERRORS.userNotExists.message,
       });
     }
 
-    return sendSuccess(reply, {
-      statusCode: STANDARD.OK.statusCode,
-      message: "USER_DELETED",
+    return reply.code(200).send({
+      success: true,
+      message: "User has been successfully deleted from the database.",
     });
   } catch (error) {
     return handleServerError(reply, error);

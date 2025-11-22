@@ -1,13 +1,16 @@
-import { FastifyInstance } from "fastify";
-import { CreateUserSchema } from "../users/users.schema";
+import { CreateUserSchema } from "@modules/users/users.schema";
 import {
   loginHandler,
   logoutHandler,
   registerHandler,
-} from "./auth.controller";
-import { LoginSchema } from "./auth.schema";
+} from "@modules/auth/auth.controller";
+import { LoginSchema } from "@modules/auth/auth.schema";
+import { FastifyPluginAsyncTypebox } from "@fastify/type-provider-typebox";
+import { FastifyTypeBox } from "@/schemas/common.schema";
 
-const authRouter = async (fastify: FastifyInstance) => {
+const authRouter: FastifyPluginAsyncTypebox = async (
+  fastify: FastifyTypeBox,
+) => {
   // REGISTER
   fastify.post("/register", {
     schema: CreateUserSchema,

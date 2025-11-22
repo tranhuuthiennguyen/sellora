@@ -21,21 +21,6 @@ const startServer = async () => {
 
   const { API_HOST, API_PORT } = app.getEnvs<typeof EnvSchema>();
 
-  // Graceful shutdown
-  const signals: NodeJS.Signals[] = ["SIGINT", "SIGTERM"];
-  signals.forEach((signal) => {
-    process.on(signal, async () => {
-      try {
-        await app.close();
-        app.log.error(`Close application on ${signal}`);
-        process.exit(0);
-      } catch (err: any) {
-        app.log.error(`Error closing application on ${signal}`, err);
-        process.exit(1);
-      }
-    });
-  });
-
   //start server
   try {
     await app.listen({
@@ -46,6 +31,21 @@ const startServer = async () => {
     app.log.error(err);
     process.exit(1);
   }
+
+  // Graceful shutdown
+  const signals: NodeJS.Signals[] = ["SIGINT", "SIGTERM"];
+  signals.forEach((signal) => {
+    process.on(signal, async () => {
+      try {
+        await app.close();
+        app.log.info(`Close application on ${signal}`);
+        process.exit(0);
+      } catch (err: any) {
+        app.log.error(`Error closing application on ${signal}`, err);
+        process.exit(1);
+      }
+    });
+  });
 };
 
 process.on("unhandledRejection", (err) => {

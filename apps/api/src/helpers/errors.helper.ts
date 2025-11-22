@@ -19,13 +19,17 @@ export const ERRORS = {
 };
 
 export const handleServerError = (reply: FastifyReply, error: any) => {
-  reply.log.error(error);
+  reply.log.error(`Server error: ${error.message}`);
 
   if (error instanceof AppError) {
-    return reply.status(error.statusCode).send({ message: error.message });
+    return reply.code(error.statusCode).send({
+      success: false,
+      message: error.message,
+    });
   }
 
-  return reply
-    .status(ERRORS.internalServerError.statusCode)
-    .send(ERRORS.internalServerError.message);
+  return reply.code(ERRORS.internalServerError.statusCode).send({
+    success: false,
+    message: ERRORS.internalServerError.message,
+  });
 };

@@ -6,7 +6,7 @@ import {
   updateUserByIdHandler,
 } from "./users.controller";
 import {
-  GetAllUsersResponseSchema,
+  GetAllUsersSchema,
   GetUserByIdSchema,
   UpdateUserSchema,
 } from "./users.schema";
@@ -14,8 +14,8 @@ import {
 const usersRouter = async (fastify: FastifyInstance) => {
   //GET ALL
   fastify.get("/", {
-    schema: GetAllUsersResponseSchema,
-    preHandler: fastify.authenticateUser,
+    schema: GetAllUsersSchema,
+    // preHandler: fastify.authenticateUser,
     handler: getAllUsersHandler,
   });
 

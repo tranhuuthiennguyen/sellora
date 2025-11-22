@@ -2,7 +2,7 @@ import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { eq } from "drizzle-orm";
 import * as schema from "@db/schema";
 import { users } from "@db/schema";
-import { CreateUser } from "./users.interface";
+import { UserEntity } from "@sellora/shared";
 
 export const getAllUsers = async (db: PostgresJsDatabase<typeof schema>) => {
   const result = await db
@@ -34,43 +34,58 @@ export const createUser = async (
     username: string;
     currencyType: string;
   },
-) => {
+): Promise<UserEntity> => {
   const { email, passwordHash, username, currencyType } = payload;
-  const result = await db
-    .insert(users)
-    .values({
-      email: email,
-      passwordHash: passwordHash,
-      username: username,
-      currencyType: currencyType,
-    })
-    .returning({
-      id: users.id,
-      username: users.username,
-      email: users.email,
-      profilePictureUrl: users.profilePictureUrl,
-      createdAt: users.createdAt,
-      updatedAt: users.updatedAt,
-    });
+  const createdUser = (
+    await db
+      .insert(users)
+      .values({
+        email: email,
+        passwordHash: passwordHash,
+        username: username,
+        currencyType: currencyType,
+      })
+      .returning({
+        id: users.id,
+        email: users.email,
+        username: users.username,
+        displayName: users.displayName,
+        bio: users.bio,
+        currencyType: users.currencyType,
+        profilePictureUrl: users.profilePictureUrl,
+        country: users.country,
+        state: users.state,
+        city: users.city,
+        zipCode: users.zipCode,
+        streetAddress: users.streetAddress,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
+      })
+  )[0] as unknown as UserEntity;
 
-  return result[0];
+  return createdUser;
 };
 
 export const checkUserExists = async (
   db: PostgresJsDatabase<typeof schema>,
   params: { userId?: number; email?: string },
 ) => {
-  if (!params.userId && !params.email) {
-    throw new Error("Either email or userId must be provided");
-  }
-
   const condition = params.userId
     ? eq(users.id, params.userId)
     : eq(users.email, params.email!);
 
-  return await db.query.users.findFirst({
+  const res = await db.query.users.findFirst({
     where: condition,
   });
+
+  if (!res) return null;
+
+  const { passwordHash, ...user } = res;
+
+  return {
+    passwordHash,
+    user,
+  };
 };
 
 export const updateUserById = async (
