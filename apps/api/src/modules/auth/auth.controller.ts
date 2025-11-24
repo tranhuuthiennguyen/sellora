@@ -46,11 +46,6 @@ export const registerHandler = async (
       });
     }
 
-    request.session.set("authUser", {
-      id: createdUser.id,
-      email: createdUser.email,
-    });
-
     return reply.code(201).send({
       success: true,
       user: createdUser,
@@ -85,15 +80,37 @@ export const loginHandler = async (
       });
     }
 
-    request.session.set("authUser", {
-      id: res.user.id,
-      email: res.user.email,
-    });
+    //////////////////////////////////////////////////
+    ////// Issue access token and refresh token //////
+    //////////////////////////////////////////////////
+    const accessToken = await reply.jwtSign(
+      {
+        id: res.user.id,
+      },
+      { expiresIn: "15m" },
+    );
 
-    return reply.code(200).send({
-      success: true,
-      user: res.user as unknown as UserEntity,
-    });
+    const refreshToken = await reply.jwtSign(
+      {
+        id: res.user.id,
+      },
+      { expiresIn: "1d" },
+    );
+
+    return reply
+      .setCookie("refreshToken", refreshToken, {
+        // domain: 'http://localhost:5000',
+        path: "/api",
+        secure: true,
+        httpOnly: true,
+        sameSite: "lax",
+      })
+      .code(200)
+      .send({
+        success: true,
+        accessToken,
+        user: res.user as unknown as UserEntity,
+      });
   } catch (error) {
     return handleServerError(reply, error);
   }
@@ -104,10 +121,49 @@ export const logoutHandler = async (
   reply: FastifyReply,
 ) => {
   try {
-    request.session.delete();
     return reply.code(200).send({
       success: true,
       message: "User logged out successfully.",
+    });
+  } catch (error) {
+    return handleServerError(reply, error);
+  }
+};
+
+export const refreshTokenHandler = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  try {
+    const refreshToken = request.cookies.refreshToken;
+    if (!refreshToken)
+      return reply.code(401).send({
+        sucess: false,
+        message: "Missing refresh token",
+      });
+    let payload: any;
+    try {
+      payload = await request.server.jwt.verify(refreshToken, {
+        onlyCookie: true,
+      });
+    } catch (error: any) {
+      return reply.code(401).send({
+        sucess: false,
+        message: `Invalid refresh token: ${error.message}`,
+      });
+    }
+    const newAccessToken = await reply.jwtSign(
+      {
+        id: payload.id,
+      },
+      {
+        expiresIn: "15m",
+      },
+    );
+
+    return reply.code(200).send({
+      success: true,
+      accessToken: newAccessToken,
     });
   } catch (error) {
     return handleServerError(reply, error);

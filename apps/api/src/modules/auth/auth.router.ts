@@ -2,6 +2,7 @@ import { CreateUserSchema } from "@modules/users/users.schema";
 import {
   loginHandler,
   logoutHandler,
+  refreshTokenHandler,
   registerHandler,
 } from "@modules/auth/auth.controller";
 import { LoginSchema } from "@modules/auth/auth.schema";
@@ -24,8 +25,13 @@ const authRouter: FastifyPluginAsyncTypebox = async (
   // LOGOUT
   fastify.get("/logout", {
     schema: {},
-    preHandler: fastify.authenticateUser,
+    onRequest: fastify.authenticateUser,
     handler: logoutHandler,
+  });
+  // REFRESH TOKEN
+  fastify.get("/refresh", {
+    schema: {},
+    handler: refreshTokenHandler,
   });
 };
 

@@ -3,6 +3,7 @@ import fp from "fastify-plugin";
 import type { UserEntity } from "@sellora/shared";
 import { ERRORS, handleServerError } from "@helpers/errors.helper";
 import { getUserById } from "@modules/users/users.service";
+import { JWT } from "@fastify/jwt";
 
 declare module "fastify" {
   interface FastifyInstance {
@@ -19,27 +20,46 @@ declare module "fastify" {
   }
 }
 
+declare module "@fastify/jwt" {
+  interface FastifyJWT {
+    payload: { id: number };
+    user: {
+      id: number;
+      email: string;
+      username: string;
+    };
+  }
+}
+
 export default fp((fastify: FastifyInstance, _: unknown, done: () => void) => {
-  const authPrehandler = async (
+  const authOnRequest = async (
     request: FastifyRequest,
     reply: FastifyReply,
   ) => {
     try {
-      const user = request.session.get("authUser");
+      const authHeader = request.headers.authorization;
 
-      if (!user) {
-        request.log.warn("Unauthorized: no user session found");
+      if (!authHeader?.startsWith("Bearer ")) {
         return reply.code(401).send({
           success: false,
           message: ERRORS.unauthorizedAccess.message,
         });
       }
 
-      const userData = await getUserById(fastify.db, user.id);
+      let payload: any;
+
+      try {
+        payload = await request.jwtVerify();
+      } catch (error) {
+        return reply.code(401).send({
+          success: false,
+          message: ERRORS.unauthorizedAccess.message,
+        });
+      }
+
+      const userData = await getUserById(fastify.db, payload.id);
 
       if (!userData) {
-        request.log.warn("Unauthorized: user not found");
-        request.session.delete();
         return reply.code(401).send({
           success: false,
           message: ERRORS.unauthorizedAccess.message,
@@ -51,6 +71,7 @@ export default fp((fastify: FastifyInstance, _: unknown, done: () => void) => {
       return handleServerError(reply, error);
     }
   };
-  fastify.decorate("authenticateUser", authPrehandler);
+  fastify.decorate("authenticateUser", authOnRequest);
+  fastify.log.info("Authentication plugin registered.");
   done();
 });

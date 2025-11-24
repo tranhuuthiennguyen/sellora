@@ -11,6 +11,7 @@ export const LoginInputSchema = Type.Object({
 export const LoginResponseSchema = {
   200: Type.Object({
     success: Type.Boolean(),
+    accessToken: Type.String(),
     user: UserSchema,
   }),
   401: BaseResponseSchema,

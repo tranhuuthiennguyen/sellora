@@ -1,23 +1,22 @@
-import fastify, { FastifySchemaValidationError } from "fastify";
+import fastify from "fastify";
 import {
   TypeBoxTypeProvider,
   TypeBoxValidatorCompiler,
 } from "@fastify/type-provider-typebox";
-import { envOptions } from "@config";
 import fastifyEnv from "@fastify/env";
+import { envOptions } from "@config";
 import authRouter from "@modules/auth/auth.router";
 import usersRouter from "@modules/users/users.router";
-
 import corsPlugin from "@plugins/cors";
 import dbPlugin from "@plugins/db";
 import swaggerPlugin from "@plugins/swagger";
 import swaggerUiPlugin from "@plugins/swagger-ui";
-import secureSession from "@plugins/secure-session";
 import auth from "@plugins/auth";
-import { logger } from "@utils/logger";
-import ajvErrors from "ajv-errors";
-import { schemaErrorFormatter } from "@utils/schemaErrorFormatter";
 import formatRegistry from "@plugins/format-registry";
+import jwt from "@plugins/jwt";
+import cookie from "@plugins/cookie";
+import { logger } from "@utils/logger";
+import { schemaErrorFormatter } from "@utils/schemaErrorFormatter";
 import { DefaultErrorFunction, SetErrorFunction } from "@sellora/shared";
 
 export async function buildApp() {
@@ -28,7 +27,6 @@ export async function buildApp() {
       customOptions: {
         allErrors: true,
       },
-      // plugins: [ajvErrors],
     },
   })
     .withTypeProvider<TypeBoxTypeProvider>()
@@ -47,7 +45,8 @@ export async function buildApp() {
   app.register(swaggerUiPlugin);
   app.register(fastifyEnv, envOptions);
   app.register(dbPlugin);
-  app.register(secureSession);
+  app.register(cookie);
+  app.register(jwt);
   app.register(auth);
 
   //Register middlewares
