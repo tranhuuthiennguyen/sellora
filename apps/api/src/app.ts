@@ -1,13 +1,20 @@
 import fastify from "fastify";
-import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
-import ajvErrors from "ajv-errors";
-import { envOptions } from "@config";
+import {
+  TypeBoxTypeProvider,
+  TypeBoxValidatorCompiler,
+} from "@fastify/type-provider-typebox";
 import fastifyEnv from "@fastify/env";
+import { envOptions } from "@config";
 import authRouter from "@modules/auth/auth.router";
 import usersRouter from "@modules/users/users.router";
+import corsPlugin from "@plugins/cors";
 import dbPlugin from "@plugins/db";
-import secureSession from "@plugins/secure-session";
+import swaggerPlugin from "@plugins/swagger";
+import swaggerUiPlugin from "@plugins/swagger-ui";
 import auth from "@plugins/auth";
+import formatRegistry from "@plugins/format-registry";
+import jwt from "@plugins/jwt";
+import cookie from "@plugins/cookie";
 import { logger } from "@utils/logger";
 import { schemaErrorFormatter } from "@utils/schemaErrorFormatter";
 
@@ -17,17 +24,22 @@ export async function buildApp() {
     schemaErrorFormatter: schemaErrorFormatter,
     ajv: {
       customOptions: {
-        coerceTypes: false,
         allErrors: true,
       },
-      plugins: [ajvErrors],
     },
-  }).withTypeProvider<TypeBoxTypeProvider>();
+  })
+    .withTypeProvider<TypeBoxTypeProvider>()
+    .setValidatorCompiler(TypeBoxValidatorCompiler);
 
   //Register plugins
+  app.register(formatRegistry);
+  app.register(corsPlugin);
+  app.register(swaggerPlugin);
+  app.register(swaggerUiPlugin);
   app.register(fastifyEnv, envOptions);
   app.register(dbPlugin);
-  app.register(secureSession);
+  app.register(cookie);
+  app.register(jwt);
   app.register(auth);
 
   //Register middlewares
@@ -50,17 +62,24 @@ export async function buildApp() {
   );
 
   //Set error handler
-  app.setErrorHandler((error, _request, reply) => {
-    app.log.error(error);
-
+  app.setErrorHandler((error: any, _request, reply) => {
     if (error.validation) {
-      const message = error.validation.map((v) => v.message).join(", ");
-      reply.status(400).send({ error: "Validation Error", message });
+      const message = error.validation.map((v: any) => v.message).join(", ");
+      return reply.code(400).send({
+        success: false,
+        message: message,
+      });
     }
-    reply.status(500).send({ error: "Something went wrong" });
+
+    return reply.code(500).send({
+      success: false,
+      message: "Something went wrong.",
+    });
   });
 
   //Health check
+
+  await app.ready();
 
   return app;
 }

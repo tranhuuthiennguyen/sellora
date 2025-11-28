@@ -1,5 +1,4 @@
 import type { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
-import { Type } from "@sinclair/typebox";
 import type {
   ContextConfigDefault,
   FastifyBaseLogger,
@@ -9,9 +8,9 @@ import type {
   RawReplyDefaultExpression,
   RawRequestDefaultExpression,
   RawServerDefault,
-  RouteGenericInterface,
 } from "fastify";
-import { FastifySchema } from "fastify/types/schema";
+import type { RouteGenericInterface } from "fastify/types/route";
+import type { FastifySchema } from "fastify/types/schema";
 
 export type FastifyTypeBox = FastifyInstance<
   RawServerDefault,
@@ -39,8 +38,3 @@ export type FastifyReplyTypeBox<TSchema extends FastifySchema> = FastifyReply<
   TSchema,
   TypeBoxTypeProvider
 >;
-
-export const BaseResponseSchema = Type.Object({
-  success: Type.Boolean(),
-  message: Type.String(),
-});

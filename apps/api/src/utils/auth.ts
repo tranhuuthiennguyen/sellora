@@ -1,14 +1,5 @@
 import * as bcrypt from "bcrypt";
 
-declare module "@fastify/secure-session" {
-  interface SessionData {
-    authUser: {
-      id: number;
-      email: string;
-    };
-  }
-}
-
 export const genSalt = (saltRounds: number, value: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     bcrypt.genSalt(saltRounds, (err, salt) => {

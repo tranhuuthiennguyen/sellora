@@ -1,21 +1,7 @@
-import { Type } from "@sinclair/typebox";
+import { LoginInputSchema, LoginResponseSchema } from "@sellora/shared/auth";
 import { FastifySchema } from "fastify";
-import { CreateUserBody, UserSchema } from "../users/users.schema";
-import { BaseResponseSchema } from "@schemas/common.schema";
 
 export const LoginSchema: FastifySchema = {
-  body: Type.Object({
-    email: Type.String(),
-    password: Type.String(),
-  }),
-  response: {
-    200: Type.Intersect([
-      BaseResponseSchema,
-      Type.Object({
-        data: UserSchema,
-      }),
-    ]),
-    401: BaseResponseSchema,
-    404: BaseResponseSchema,
-  },
+  body: LoginInputSchema,
+  response: LoginResponseSchema,
 };

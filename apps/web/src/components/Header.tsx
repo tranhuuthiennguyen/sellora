@@ -1,6 +1,8 @@
+import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "@tanstack/react-router";
 
 export default function Header() {
+  const { accessToken } = useAuth();
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-black text-white tracking-tight">
       <div className="flex items-center justify-between border border-black border-solid">
@@ -36,18 +38,29 @@ export default function Header() {
               About
             </a>
           </nav>
-          <Link
-            to="/login"
-            className="p-4 transition-colors duration-200 hover:bg-white hover:text-black border-l border-neutral-500"
-          >
-            Log in
-          </Link>
-          <Link
-            to="/signup"
-            className="p-4 bg-lavender-rose transition-colors duration-200 hover:bg-white text-black"
-          >
-            Start selling
-          </Link>
+          {!accessToken ? (
+            <>
+              <Link
+                to="/login"
+                className="p-4 transition-colors duration-200 hover:bg-white hover:text-black border-l border-neutral-500"
+              >
+                Log in
+              </Link>
+              <Link
+                to="/signup"
+                className="p-4 bg-lavender-rose transition-colors duration-200 hover:bg-white text-black"
+              >
+                Start selling
+              </Link>
+            </>
+          ) : (
+            <Link
+              to="/dashboard"
+              className="p-4 bg-lavender-rose transition-colors duration-200 hover:bg-white text-black"
+            >
+              Dashboard
+            </Link>
+          )}
         </div>
       </div>
     </header>

@@ -1,19 +1,17 @@
 {
-  "extends": "@sellora/typescript-config/base.json",
+  "extends": "@sellora/typescript-config/fastify.json",
   "compilerOptions": {
-    "ignoreDeprecations": "6.0",
     "outDir": "dist",
-    "baseUrl": "./src",
     "paths": {
-      "@/*": ["./*"],
-      "@config": ["config"],
-      "@contants": ["constants"],
-      "@db/*": ["db/*"],
-      "@modules/*": ["modules/*"],
-      "@plugins/*": ["plugins/*"],
-      "@schemas/*": ["schemas/*"],
-      "@utils/*": ["utils/*"],
-      "@helpers/*": ["helpers/*"]
+      "@/*": ["./src/*"],
+      "@config": ["./src/config"],
+      "@contants": ["./src/constants"],
+      "@db/*": ["./src/db/*"],
+      "@modules/*": ["./src/modules/*"],
+      "@plugins/*": ["./src/plugins/*"],
+      "@schemas/*": ["./src/schemas/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@helpers/*": ["./src/helpers/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.json", ".env", "src/**/*.feature", "src/**/*.d.ts"],

@@ -4,36 +4,36 @@ import {
   getAllUsersHandler,
   getUserByIdHandler,
   updateUserByIdHandler,
-} from "./users.controller";
+} from "@modules/users/users.controller";
 import {
-  GetAllUsersResponseSchema,
+  GetAllUsersSchema,
   GetUserByIdSchema,
   UpdateUserSchema,
-} from "./users.schema";
+} from "@modules/users/users.schema";
 
 const usersRouter = async (fastify: FastifyInstance) => {
   //GET ALL
   fastify.get("/", {
-    schema: GetAllUsersResponseSchema,
-    preHandler: fastify.authenticateUser,
+    schema: GetAllUsersSchema,
+    onRequest: fastify.authenticateUser,
     handler: getAllUsersHandler,
   });
 
   //GET BY ID
   fastify.get("/:userId", {
     schema: GetUserByIdSchema,
-    preHandler: fastify.authenticateUser,
+    onRequest: fastify.authenticateUser,
     handler: getUserByIdHandler,
   });
   //UPDATE BY ID
   fastify.patch("/:userId", {
     schema: UpdateUserSchema,
-    preHandler: fastify.authenticateUser,
+    onRequest: fastify.authenticateUser,
     handler: updateUserByIdHandler,
   });
   //DELETE BY ID
   fastify.delete("/:userId", {
-    preHandler: fastify.authenticateUser,
+    onRequest: fastify.authenticateUser,
     handler: deleteUserByIdHandler,
   });
 };
