@@ -17,7 +17,6 @@ import jwt from "@plugins/jwt";
 import cookie from "@plugins/cookie";
 import { logger } from "@utils/logger";
 import { schemaErrorFormatter } from "@utils/schemaErrorFormatter";
-import { DefaultErrorFunction, SetErrorFunction } from "@sellora/shared";
 
 export async function buildApp() {
   const app = fastify({
@@ -31,12 +30,6 @@ export async function buildApp() {
   })
     .withTypeProvider<TypeBoxTypeProvider>()
     .setValidatorCompiler(TypeBoxValidatorCompiler);
-
-  SetErrorFunction((parameter) => {
-    return "errorMessage" in parameter.schema
-      ? parameter.schema.errorMessage
-      : DefaultErrorFunction(parameter);
-  });
 
   //Register plugins
   app.register(formatRegistry);

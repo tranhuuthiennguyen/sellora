@@ -6,7 +6,7 @@ import {
 
 const Email = /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/i;
 
-export function IsEmail(value): boolean {
+export function IsEmail(value: string): boolean {
   return Email.test(value);
 }
 

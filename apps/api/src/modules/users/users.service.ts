@@ -2,7 +2,7 @@ import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { eq } from "drizzle-orm";
 import * as schema from "@db/schema";
 import { users } from "@db/schema";
-import { UserEntity } from "@sellora/shared";
+import { UserEntity } from "@sellora/shared/user";
 
 export const getAllUsers = async (db: PostgresJsDatabase<typeof schema>) => {
   const result = await db

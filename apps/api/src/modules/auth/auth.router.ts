@@ -4,6 +4,7 @@ import {
   logoutHandler,
   refreshTokenHandler,
   registerHandler,
+  restoreSessionHandler,
 } from "@modules/auth/auth.controller";
 import { LoginSchema } from "@modules/auth/auth.schema";
 import { FastifyPluginAsyncTypebox } from "@fastify/type-provider-typebox";
@@ -32,6 +33,12 @@ const authRouter: FastifyPluginAsyncTypebox = async (
   fastify.get("/refresh", {
     schema: {},
     handler: refreshTokenHandler,
+  });
+
+  fastify.get("/me", {
+    schema: {},
+    onRequest: fastify.authenticateUser,
+    handler: restoreSessionHandler,
   });
 };
 

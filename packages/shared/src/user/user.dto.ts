@@ -1,5 +1,5 @@
 import { Static } from "@sinclair/typebox";
-import { CreateUserInputSchema, UpdateUserInputSchema } from "./user.schema";
+import { CreateUserInputSchema, UpdateUserInputSchema } from "./user.schema.js";
 
 export type CreateUserDto = Static<typeof CreateUserInputSchema>;
 

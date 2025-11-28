@@ -4,12 +4,12 @@ import {
   getAllUsersHandler,
   getUserByIdHandler,
   updateUserByIdHandler,
-} from "./users.controller";
+} from "@modules/users/users.controller";
 import {
   GetAllUsersSchema,
   GetUserByIdSchema,
   UpdateUserSchema,
-} from "./users.schema";
+} from "@modules/users/users.schema";
 
 const usersRouter = async (fastify: FastifyInstance) => {
   //GET ALL

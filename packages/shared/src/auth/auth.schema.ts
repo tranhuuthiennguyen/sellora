@@ -1,6 +1,6 @@
-import { EmailSchema, PasswordSchema } from "../validation/format";
-import { BaseResponseSchema } from "../lib/common.schema";
-import { UserSchema } from "../users/user.schema";
+import { EmailSchema, PasswordSchema } from "../validation/format.js";
+import { BaseResponseSchema } from "../lib/common.schema.js";
+import { UserSchema } from "../user/user.schema.js";
 import { Type } from "@sinclair/typebox";
 
 export const LoginInputSchema = Type.Object({

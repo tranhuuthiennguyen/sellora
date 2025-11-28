@@ -1,6 +1,6 @@
 import fp from "fastify-plugin";
 import { Format } from "@fastify/type-provider-typebox";
-import { IsEmail } from "@sellora/shared";
+import { IsEmail } from "@sellora/shared/validation";
 
 export default fp(async (app) => {
   Format.Set("email", (value) => IsEmail(value));

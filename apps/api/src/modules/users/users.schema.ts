@@ -1,4 +1,5 @@
 import { FastifySchema } from "fastify";
+import { Type } from "@fastify/type-provider-typebox";
 import {
   CreateUserInputSchema,
   CreateUserResponseSchema,
@@ -7,8 +8,7 @@ import {
   GetUserByIdResponseSchema,
   UpdateUserInputSchema,
   UpdateUserResponseSchema,
-} from "@sellora/shared";
-import { Type } from "@fastify/type-provider-typebox";
+} from "@sellora/shared/user";
 
 export const GetUserByIdSchema: FastifySchema = {
   params: {

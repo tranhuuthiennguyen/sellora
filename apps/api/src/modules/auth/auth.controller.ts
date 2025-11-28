@@ -1,14 +1,24 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { ERRORS, handleServerError } from "@helpers/errors.helper";
-import { checkUserExists, createUser } from "@modules/users/users.service";
+import { handleServerError } from "@helpers/errors.helper";
+import {
+  checkUserExists,
+  createUser,
+  getUserById,
+} from "@modules/users/users.service";
 import { compareHash, genSalt } from "@utils/auth";
 import {
   FastifyReplyTypeBox,
   FastifyRequestTypeBox,
 } from "@/schemas/common.schema";
 import { CreateUserSchema } from "@modules/users/users.schema";
-import { LoginSchema } from "./auth.schema";
-import type { CreateUserDto, LoginInputDto, UserEntity } from "@sellora/shared";
+import { LoginSchema } from "@modules/auth/auth.schema";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "@modules/auth/auth.service";
+import { CreateUserDto, UserEntity } from "@sellora/shared/user";
+import { ERRORS } from "@sellora/shared/lib";
+import { LoginInputDto } from "@sellora/shared/auth";
 
 export const registerHandler = async (
   request: FastifyRequestTypeBox<typeof CreateUserSchema>,
@@ -83,19 +93,9 @@ export const loginHandler = async (
     //////////////////////////////////////////////////
     ////// Issue access token and refresh token //////
     //////////////////////////////////////////////////
-    const accessToken = await reply.jwtSign(
-      {
-        id: res.user.id,
-      },
-      { expiresIn: "15m" },
-    );
+    const accessToken = await generateAccessToken(reply, res.user);
 
-    const refreshToken = await reply.jwtSign(
-      {
-        id: res.user.id,
-      },
-      { expiresIn: "1d" },
-    );
+    const refreshToken = await generateRefreshToken(reply, res.user);
 
     return reply
       .setCookie("refreshToken", refreshToken, {
@@ -136,34 +136,55 @@ export const refreshTokenHandler = async (
 ) => {
   try {
     const refreshToken = request.cookies.refreshToken;
+
     if (!refreshToken)
       return reply.code(401).send({
-        sucess: false,
+        success: false,
         message: "Missing refresh token",
       });
+
     let payload: any;
+
     try {
       payload = await request.server.jwt.verify(refreshToken, {
         onlyCookie: true,
       });
     } catch (error: any) {
       return reply.code(401).send({
-        sucess: false,
+        success: false,
         message: `Invalid refresh token: ${error.message}`,
       });
     }
-    const newAccessToken = await reply.jwtSign(
-      {
-        id: payload.id,
-      },
-      {
-        expiresIn: "15m",
-      },
-    );
+
+    const newAccessToken = await generateAccessToken(reply, payload);
 
     return reply.code(200).send({
       success: true,
       accessToken: newAccessToken,
+    });
+  } catch (error) {
+    return handleServerError(reply, error);
+  }
+};
+
+export const restoreSessionHandler = async (
+  request: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  try {
+    const userId = request.currentUser.id;
+    const user = await getUserById(request.server.db, userId);
+
+    if (!user) {
+      return reply.code(401).send({
+        success: false,
+        message: ERRORS.unauthorizedAccess.message,
+      });
+    }
+
+    return reply.code(200).send({
+      success: true,
+      user,
     });
   } catch (error) {
     return handleServerError(reply, error);

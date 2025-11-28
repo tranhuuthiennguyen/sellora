@@ -1,14 +1,11 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { ERRORS, handleServerError } from "@helpers/errors.helper";
+import { handleServerError } from "@helpers/errors.helper";
 import {
   deleteUserById,
   getAllUsers,
   getUserById,
   updateUserById,
-} from "./users.service";
-import { STANDARD } from "@/constants";
-import type { UserEntity } from "@sellora/shared";
-import { sendError, sendSuccess } from "@utils/response";
+} from "@modules/users/users.service";
 import {
   FastifyReplyTypeBox,
   FastifyRequestTypeBox,
@@ -18,6 +15,8 @@ import {
   GetUserByIdSchema,
   UpdateUserSchema,
 } from "@modules/users/users.schema";
+import { UserEntity } from "@sellora/shared/user";
+import { ERRORS } from "@sellora/shared/lib";
 
 export const getAllUsersHandler = async (
   request: FastifyRequest,
