@@ -19,6 +19,7 @@ import {
 import { CreateUserDto, UserEntity } from "@sellora/shared/user";
 import { ERRORS } from "@sellora/shared/lib";
 import { LoginInputDto } from "@sellora/shared/auth";
+import { EnvSchema } from "@/utils/validateEnv";
 
 export const registerHandler = async (
   request: FastifyRequestTypeBox<typeof CreateUserSchema>,
@@ -97,13 +98,16 @@ export const loginHandler = async (
 
     const refreshToken = await generateRefreshToken(reply, res.user);
 
+    const { NODE_ENV } = request.getEnvs<typeof EnvSchema>();
+
     return reply
       .setCookie("refreshToken", refreshToken, {
-        // domain: 'http://localhost:5000',
-        path: "/api",
+        // domain: 'http://localhost:3000',
+        path: "/",
         secure: true,
         httpOnly: true,
-        sameSite: "lax",
+        sameSite: "none",
+        maxAge: 60 * 60 * 24 * 30,
       })
       .code(200)
       .send({
@@ -121,6 +125,12 @@ export const logoutHandler = async (
   reply: FastifyReply,
 ) => {
   try {
+    reply.clearCookie("refreshToken", {
+      path: "/",
+      secure: true,
+      httpOnly: true,
+      sameSite: "none",
+    });
     return reply.code(200).send({
       success: true,
       message: "User logged out successfully.",
@@ -172,15 +182,18 @@ export const restoreSessionHandler = async (
   reply: FastifyReply,
 ) => {
   try {
-    const userId = request.currentUser.id;
-    const user = await getUserById(request.server.db, userId);
+    const refreshToken = request.cookies.refreshToken;
 
-    if (!user) {
-      return reply.code(401).send({
-        success: false,
-        message: ERRORS.unauthorizedAccess.message,
-      });
-    }
+    const decoded: any = await request.server.jwt.decode(refreshToken!);
+
+    const user = await getUserById(request.server.db, decoded.id);
+
+    // if (!user) {
+    //   return reply.code(401).send({
+    //     success: false,
+    //     message: ERRORS.unauthorizedAccess.message,
+    //   });
+    // }
 
     return reply.code(200).send({
       success: true,

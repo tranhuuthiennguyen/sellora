@@ -43,6 +43,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string) => {
     try {
       const res = await api.post("/auth/login", { email, password });
+      // useEffect(() => {})
       setToken(res.data.accessToken);
       setUser(res.data.user);
 
@@ -58,20 +59,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = async () => {
-    await api.post("/auth/logout");
-    setToken(null);
-    setUser(null);
+    try {
+      await api.post("/auth/logout");
+    } catch (error) {
+      setToken(null);
+      setUser(null);
+    }
   };
 
   const isAuthenticated = !!token;
 
   useEffect(() => {
-    const fetchMe = async () => {
+    const init = async () => {
       try {
-        const response = await api.get("/auth/refresh");
-        setToken(response.data.accessToken);
+        const res = await api.get("/auth/refresh");
+        const token = res.data.accessToken;
+        setToken(token);
 
-        const me = await api.get("/auth/me");
+        const me = await api.get("/auth/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setUser(me.data.user);
       } catch {
         setToken(null);
@@ -79,7 +86,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     };
 
-    fetchMe();
+    init();
   }, []);
 
   useLayoutEffect(() => {
