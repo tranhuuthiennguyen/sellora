@@ -2,12 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import AuthLayout from "@/components/auth/AuthLayout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const Route = createFileRoute("/signup")({
   component: Signup,
 });
 
 function Signup() {
+  const { register } = useAuth();
   return (
     <AuthLayout title="Sign up">
       {/* Social Buttons */}

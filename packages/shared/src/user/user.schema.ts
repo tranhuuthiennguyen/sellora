@@ -40,12 +40,6 @@ export const GetAllUsersResponseSchema = {
 export const CreateUserInputSchema = Type.Object({
   email: EmailSchema,
   password: PasswordSchema,
-  username: Type.String({ minLength: 3 }),
-  currencyType: Type.String({
-    minLength: 3,
-    maxLength: 10,
-    default: "USD",
-  }),
 });
 
 export const CreateUserResponseSchema = {

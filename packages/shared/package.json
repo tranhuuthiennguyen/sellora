@@ -45,7 +45,8 @@
     }
   },
   "dependencies": {
-    "@sinclair/typebox": "^0.34.41"
+    "@sinclair/typebox": "^0.34.41",
+    "@vvo/tzdb": "^6.198.0"
   },
   "devDependencies": {
     "@sellora/eslint-config": "*",

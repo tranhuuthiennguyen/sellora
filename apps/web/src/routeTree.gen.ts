@@ -14,8 +14,12 @@ import { Route as LoginRouteImport } from "./routes/login";
 import { Route as AboutRouteImport } from "./routes/about";
 import { Route as AppRouteImport } from "./routes/_app";
 import { Route as IndexRouteImport } from "./routes/index";
+import { Route as AppSettingsRouteImport } from "./routes/_app/settings";
 import { Route as AppProductsRouteImport } from "./routes/_app/products";
 import { Route as AppDashboardRouteImport } from "./routes/_app/dashboard";
+import { Route as AppSettingsIndexRouteImport } from "./routes/_app/settings/index";
+import { Route as AppSettingsProfileRouteImport } from "./routes/_app/settings/profile";
+import { Route as AppSettingsPasswordRouteImport } from "./routes/_app/settings/password";
 
 const SignupRoute = SignupRouteImport.update({
   id: "/signup",
@@ -41,6 +45,11 @@ const IndexRoute = IndexRouteImport.update({
   path: "/",
   getParentRoute: () => rootRouteImport,
 } as any);
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: "/settings",
+  path: "/settings",
+  getParentRoute: () => AppRoute,
+} as any);
 const AppProductsRoute = AppProductsRouteImport.update({
   id: "/products",
   path: "/products",
@@ -51,6 +60,21 @@ const AppDashboardRoute = AppDashboardRouteImport.update({
   path: "/dashboard",
   getParentRoute: () => AppRoute,
 } as any);
+const AppSettingsIndexRoute = AppSettingsIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => AppSettingsRoute,
+} as any);
+const AppSettingsProfileRoute = AppSettingsProfileRouteImport.update({
+  id: "/profile",
+  path: "/profile",
+  getParentRoute: () => AppSettingsRoute,
+} as any);
+const AppSettingsPasswordRoute = AppSettingsPasswordRouteImport.update({
+  id: "/password",
+  path: "/password",
+  getParentRoute: () => AppSettingsRoute,
+} as any);
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute;
@@ -59,6 +83,10 @@ export interface FileRoutesByFullPath {
   "/signup": typeof SignupRoute;
   "/dashboard": typeof AppDashboardRoute;
   "/products": typeof AppProductsRoute;
+  "/settings": typeof AppSettingsRouteWithChildren;
+  "/settings/password": typeof AppSettingsPasswordRoute;
+  "/settings/profile": typeof AppSettingsProfileRoute;
+  "/settings/": typeof AppSettingsIndexRoute;
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute;
@@ -67,6 +95,9 @@ export interface FileRoutesByTo {
   "/signup": typeof SignupRoute;
   "/dashboard": typeof AppDashboardRoute;
   "/products": typeof AppProductsRoute;
+  "/settings/password": typeof AppSettingsPasswordRoute;
+  "/settings/profile": typeof AppSettingsProfileRoute;
+  "/settings": typeof AppSettingsIndexRoute;
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
@@ -77,12 +108,35 @@ export interface FileRoutesById {
   "/signup": typeof SignupRoute;
   "/_app/dashboard": typeof AppDashboardRoute;
   "/_app/products": typeof AppProductsRoute;
+  "/_app/settings": typeof AppSettingsRouteWithChildren;
+  "/_app/settings/password": typeof AppSettingsPasswordRoute;
+  "/_app/settings/profile": typeof AppSettingsProfileRoute;
+  "/_app/settings/": typeof AppSettingsIndexRoute;
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/" | "/about" | "/login" | "/signup" | "/dashboard" | "/products";
+  fullPaths:
+    | "/"
+    | "/about"
+    | "/login"
+    | "/signup"
+    | "/dashboard"
+    | "/products"
+    | "/settings"
+    | "/settings/password"
+    | "/settings/profile"
+    | "/settings/";
   fileRoutesByTo: FileRoutesByTo;
-  to: "/" | "/about" | "/login" | "/signup" | "/dashboard" | "/products";
+  to:
+    | "/"
+    | "/about"
+    | "/login"
+    | "/signup"
+    | "/dashboard"
+    | "/products"
+    | "/settings/password"
+    | "/settings/profile"
+    | "/settings";
   id:
     | "__root__"
     | "/"
@@ -91,7 +145,11 @@ export interface FileRouteTypes {
     | "/login"
     | "/signup"
     | "/_app/dashboard"
-    | "/_app/products";
+    | "/_app/products"
+    | "/_app/settings"
+    | "/_app/settings/password"
+    | "/_app/settings/profile"
+    | "/_app/settings/";
   fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
@@ -139,6 +197,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof IndexRouteImport;
       parentRoute: typeof rootRouteImport;
     };
+    "/_app/settings": {
+      id: "/_app/settings";
+      path: "/settings";
+      fullPath: "/settings";
+      preLoaderRoute: typeof AppSettingsRouteImport;
+      parentRoute: typeof AppRoute;
+    };
     "/_app/products": {
       id: "/_app/products";
       path: "/products";
@@ -153,17 +218,56 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof AppDashboardRouteImport;
       parentRoute: typeof AppRoute;
     };
+    "/_app/settings/": {
+      id: "/_app/settings/";
+      path: "/";
+      fullPath: "/settings/";
+      preLoaderRoute: typeof AppSettingsIndexRouteImport;
+      parentRoute: typeof AppSettingsRoute;
+    };
+    "/_app/settings/profile": {
+      id: "/_app/settings/profile";
+      path: "/profile";
+      fullPath: "/settings/profile";
+      preLoaderRoute: typeof AppSettingsProfileRouteImport;
+      parentRoute: typeof AppSettingsRoute;
+    };
+    "/_app/settings/password": {
+      id: "/_app/settings/password";
+      path: "/password";
+      fullPath: "/settings/password";
+      preLoaderRoute: typeof AppSettingsPasswordRouteImport;
+      parentRoute: typeof AppSettingsRoute;
+    };
   }
 }
+
+interface AppSettingsRouteChildren {
+  AppSettingsPasswordRoute: typeof AppSettingsPasswordRoute;
+  AppSettingsProfileRoute: typeof AppSettingsProfileRoute;
+  AppSettingsIndexRoute: typeof AppSettingsIndexRoute;
+}
+
+const AppSettingsRouteChildren: AppSettingsRouteChildren = {
+  AppSettingsPasswordRoute: AppSettingsPasswordRoute,
+  AppSettingsProfileRoute: AppSettingsProfileRoute,
+  AppSettingsIndexRoute: AppSettingsIndexRoute,
+};
+
+const AppSettingsRouteWithChildren = AppSettingsRoute._addFileChildren(
+  AppSettingsRouteChildren,
+);
 
 interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute;
   AppProductsRoute: typeof AppProductsRoute;
+  AppSettingsRoute: typeof AppSettingsRouteWithChildren;
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppProductsRoute: AppProductsRoute,
+  AppSettingsRoute: AppSettingsRouteWithChildren,
 };
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren);

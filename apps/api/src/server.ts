@@ -3,6 +3,7 @@ import moduleAlias from "module-alias";
 // ugliest file entry ever
 moduleAlias.addAliases({
   "@": `${__dirname}`,
+  "@certs": `${__dirname}/certs`,
   "@config": `${__dirname}/config`,
   "@contants": `${__dirname}/constants`,
   "@db": `${__dirname}/db`,

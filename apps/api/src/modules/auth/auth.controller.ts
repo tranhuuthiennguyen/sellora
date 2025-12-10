@@ -3,6 +3,7 @@ import { handleServerError } from "@helpers/errors.helper";
 import {
   checkUserExists,
   createUser,
+  generateUniqueUsername,
   getUserById,
 } from "@modules/users/users.service";
 import { compareHash, genSalt } from "@utils/auth";
@@ -26,8 +27,7 @@ export const registerHandler = async (
   reply: FastifyReplyTypeBox<typeof CreateUserSchema>,
 ) => {
   try {
-    const { email, password, username, currencyType } =
-      request.body as CreateUserDto;
+    const { email, password } = request.body as CreateUserDto;
 
     const user = await checkUserExists(request.server.db, { email });
     if (user) {
@@ -39,11 +39,12 @@ export const registerHandler = async (
 
     const hashPwd = await genSalt(10, password);
 
+    const username = await generateUniqueUsername(request.server.db, email);
+
     const payload = {
       email: email,
       passwordHash: hashPwd,
       username: username,
-      currencyType: currencyType,
     };
     const createdUser: UserEntity = await createUser(
       request.server.db,
@@ -187,13 +188,6 @@ export const restoreSessionHandler = async (
     const decoded: any = await request.server.jwt.decode(refreshToken!);
 
     const user = await getUserById(request.server.db, decoded.id);
-
-    // if (!user) {
-    //   return reply.code(401).send({
-    //     success: false,
-    //     message: ERRORS.unauthorizedAccess.message,
-    //   });
-    // }
 
     return reply.code(200).send({
       success: true,

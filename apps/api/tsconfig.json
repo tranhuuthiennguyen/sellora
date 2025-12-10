@@ -4,6 +4,7 @@
     "outDir": "dist",
     "paths": {
       "@/*": ["./src/*"],
+      "@certs/*": ["./src/certs/*"],
       "@config": ["./src/config"],
       "@contants": ["./src/constants"],
       "@db/*": ["./src/db/*"],
@@ -14,7 +15,7 @@
       "@helpers/*": ["./src/helpers/*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.json", ".env", "src/**/*.feature", "src/**/*.d.ts"],
+  "include": ["src/**/*.ts", "src/**/*.json", ".env", "src/**/*.feature", "src/**/*.d.ts", "src/**/*.key"],
   "exclude": [
     "node_modules",
     "dist"

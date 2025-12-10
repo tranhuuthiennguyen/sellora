@@ -60,9 +60,9 @@ export default fp((fastify: FastifyInstance, _: unknown, done: () => void) => {
       const userData = await getUserById(fastify.db, payload.id);
 
       if (!userData) {
-        return reply.code(401).send({
+        return reply.code(404).send({
           success: false,
-          message: ERRORS.unauthorizedAccess.message,
+          message: ERRORS.userNotExists.message,
         });
       }
 

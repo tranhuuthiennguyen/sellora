@@ -18,12 +18,17 @@ declare module "axios" {
 interface AuthContextType {
   user: UserEntity | null;
   accessToken: string | null;
+  register: (
+    email: string,
+    password: string,
+  ) => Promise<{ success?: boolean; message?: string }>;
   login: (
     email: string,
     password: string,
   ) => Promise<{ success?: boolean; message?: string }>;
   logout: () => void;
   isAuthenticated: boolean;
+  isBootstrapping: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,6 +44,21 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserEntity | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [isBootstrapping, setIsBootstrapping] = useState(true);
+
+  const register = async (email: string, password: string) => {
+    try {
+      const res = await api.post("/auth/register", { email, password });
+      return {
+        success: true,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.response?.data?.message,
+      };
+    }
+  };
 
   const login = async (email: string, password: string) => {
     try {
@@ -76,13 +96,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const token = res.data.accessToken;
         setToken(token);
 
-        const me = await api.get("/auth/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const me = await api.get("/auth/me");
         setUser(me.data.user);
       } catch {
         setToken(null);
         setUser(null);
+      } finally {
+        setIsBootstrapping(false);
       }
     };
 
@@ -141,9 +161,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       value={{
         user,
         accessToken: token,
+        register,
         login,
         logout,
         isAuthenticated,
+        isBootstrapping,
       }}
     >
       {children}

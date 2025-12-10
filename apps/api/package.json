@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "start": "node -r module-alias/register dist/server.js",
+    "start": "node dist/server.js",
     "dev": "nodemon",
     "generate": "npx drizzle-kit generate --config=src/db/drizzle.config.ts",
     "migrate": "npx drizzle-kit migrate --config=src/db/drizzle.config.ts",
@@ -66,6 +66,7 @@
   },
   "_moduleAliases": {
     "@": "dist",
+    "@certs": "dist/certs",
     "@config": "dist/config",
     "@contants": "dist/constants",
     "@db": "dist/db",
