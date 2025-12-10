@@ -56,6 +56,7 @@ export const createUser = async (
         city: users.city,
         zipCode: users.zipCode,
         streetAddress: users.streetAddress,
+        timezone: users.timezone,
         createdAt: users.createdAt,
         updatedAt: users.updatedAt,
       })
@@ -133,17 +134,18 @@ export const generateUniqueUsername = async (
 
   let username = base;
   let counter = 1;
-  while (true) {
-    const exists = await db
-      .selectDistinct({ username: users.username })
-      .from(users)
-      .where(eq(users.username, username));
 
-    if (!exists) break;
+  while (true) {
+    const exists = (
+      await db
+        .selectDistinct({ username: users.username })
+        .from(users)
+        .where(eq(users.username, username))
+    )[0];
+
+    if (!exists) return username;
 
     username = `${base}-${counter}`;
     counter++;
   }
-
-  return username;
 };
