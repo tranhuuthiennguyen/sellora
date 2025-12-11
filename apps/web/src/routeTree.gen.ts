@@ -8,269 +8,269 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as SignupRouteImport } from "./routes/signup";
-import { Route as LoginRouteImport } from "./routes/login";
-import { Route as AboutRouteImport } from "./routes/about";
-import { Route as AppRouteImport } from "./routes/_app";
-import { Route as IndexRouteImport } from "./routes/index";
-import { Route as AppSettingsRouteImport } from "./routes/_app/settings";
-import { Route as AppProductsRouteImport } from "./routes/_app/products";
-import { Route as AppDashboardRouteImport } from "./routes/_app/dashboard";
-import { Route as AppSettingsIndexRouteImport } from "./routes/_app/settings/index";
-import { Route as AppSettingsProfileRouteImport } from "./routes/_app/settings/profile";
-import { Route as AppSettingsPasswordRouteImport } from "./routes/_app/settings/password";
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppSettingsRouteImport } from './routes/_app/settings'
+import { Route as AppProductsRouteImport } from './routes/_app/products'
+import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
+import { Route as AppSettingsIndexRouteImport } from './routes/_app/settings/index'
+import { Route as AppSettingsProfileRouteImport } from './routes/_app/settings/profile'
+import { Route as AppSettingsPasswordRouteImport } from './routes/_app/settings/password'
 
 const SignupRoute = SignupRouteImport.update({
-  id: "/signup",
-  path: "/signup",
+  id: '/signup',
+  path: '/signup',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const LoginRoute = LoginRouteImport.update({
-  id: "/login",
-  path: "/login",
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const AboutRoute = AboutRouteImport.update({
-  id: "/about",
-  path: "/about",
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const AppRoute = AppRouteImport.update({
-  id: "/_app",
+  id: '/_app',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
-  id: "/settings",
-  path: "/settings",
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AppRoute,
-} as any);
+} as any)
 const AppProductsRoute = AppProductsRouteImport.update({
-  id: "/products",
-  path: "/products",
+  id: '/products',
+  path: '/products',
   getParentRoute: () => AppRoute,
-} as any);
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
-  id: "/dashboard",
-  path: "/dashboard",
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => AppRoute,
-} as any);
+} as any)
 const AppSettingsIndexRoute = AppSettingsIndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => AppSettingsRoute,
-} as any);
+} as any)
 const AppSettingsProfileRoute = AppSettingsProfileRouteImport.update({
-  id: "/profile",
-  path: "/profile",
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => AppSettingsRoute,
-} as any);
+} as any)
 const AppSettingsPasswordRoute = AppSettingsPasswordRouteImport.update({
-  id: "/password",
-  path: "/password",
+  id: '/password',
+  path: '/password',
   getParentRoute: () => AppSettingsRoute,
-} as any);
+} as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute;
-  "/about": typeof AboutRoute;
-  "/login": typeof LoginRoute;
-  "/signup": typeof SignupRoute;
-  "/dashboard": typeof AppDashboardRoute;
-  "/products": typeof AppProductsRoute;
-  "/settings": typeof AppSettingsRouteWithChildren;
-  "/settings/password": typeof AppSettingsPasswordRoute;
-  "/settings/profile": typeof AppSettingsProfileRoute;
-  "/settings/": typeof AppSettingsIndexRoute;
+  '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/products': typeof AppProductsRoute
+  '/settings': typeof AppSettingsRouteWithChildren
+  '/settings/password': typeof AppSettingsPasswordRoute
+  '/settings/profile': typeof AppSettingsProfileRoute
+  '/settings/': typeof AppSettingsIndexRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute;
-  "/about": typeof AboutRoute;
-  "/login": typeof LoginRoute;
-  "/signup": typeof SignupRoute;
-  "/dashboard": typeof AppDashboardRoute;
-  "/products": typeof AppProductsRoute;
-  "/settings/password": typeof AppSettingsPasswordRoute;
-  "/settings/profile": typeof AppSettingsProfileRoute;
-  "/settings": typeof AppSettingsIndexRoute;
+  '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/products': typeof AppProductsRoute
+  '/settings/password': typeof AppSettingsPasswordRoute
+  '/settings/profile': typeof AppSettingsProfileRoute
+  '/settings': typeof AppSettingsIndexRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  "/": typeof IndexRoute;
-  "/_app": typeof AppRouteWithChildren;
-  "/about": typeof AboutRoute;
-  "/login": typeof LoginRoute;
-  "/signup": typeof SignupRoute;
-  "/_app/dashboard": typeof AppDashboardRoute;
-  "/_app/products": typeof AppProductsRoute;
-  "/_app/settings": typeof AppSettingsRouteWithChildren;
-  "/_app/settings/password": typeof AppSettingsPasswordRoute;
-  "/_app/settings/profile": typeof AppSettingsProfileRoute;
-  "/_app/settings/": typeof AppSettingsIndexRoute;
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/about': typeof AboutRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/products': typeof AppProductsRoute
+  '/_app/settings': typeof AppSettingsRouteWithChildren
+  '/_app/settings/password': typeof AppSettingsPasswordRoute
+  '/_app/settings/profile': typeof AppSettingsProfileRoute
+  '/_app/settings/': typeof AppSettingsIndexRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
+  fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | "/"
-    | "/about"
-    | "/login"
-    | "/signup"
-    | "/dashboard"
-    | "/products"
-    | "/settings"
-    | "/settings/password"
-    | "/settings/profile"
-    | "/settings/";
-  fileRoutesByTo: FileRoutesByTo;
+    | '/'
+    | '/about'
+    | '/login'
+    | '/signup'
+    | '/dashboard'
+    | '/products'
+    | '/settings'
+    | '/settings/password'
+    | '/settings/profile'
+    | '/settings/'
+  fileRoutesByTo: FileRoutesByTo
   to:
-    | "/"
-    | "/about"
-    | "/login"
-    | "/signup"
-    | "/dashboard"
-    | "/products"
-    | "/settings/password"
-    | "/settings/profile"
-    | "/settings";
+    | '/'
+    | '/about'
+    | '/login'
+    | '/signup'
+    | '/dashboard'
+    | '/products'
+    | '/settings/password'
+    | '/settings/profile'
+    | '/settings'
   id:
-    | "__root__"
-    | "/"
-    | "/_app"
-    | "/about"
-    | "/login"
-    | "/signup"
-    | "/_app/dashboard"
-    | "/_app/products"
-    | "/_app/settings"
-    | "/_app/settings/password"
-    | "/_app/settings/profile"
-    | "/_app/settings/";
-  fileRoutesById: FileRoutesById;
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/about'
+    | '/login'
+    | '/signup'
+    | '/_app/dashboard'
+    | '/_app/products'
+    | '/_app/settings'
+    | '/_app/settings/password'
+    | '/_app/settings/profile'
+    | '/_app/settings/'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  AppRoute: typeof AppRouteWithChildren;
-  AboutRoute: typeof AboutRoute;
-  LoginRoute: typeof LoginRoute;
-  SignupRoute: typeof SignupRoute;
+  IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  AboutRoute: typeof AboutRoute
+  LoginRoute: typeof LoginRoute
+  SignupRoute: typeof SignupRoute
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/signup": {
-      id: "/signup";
-      path: "/signup";
-      fullPath: "/signup";
-      preLoaderRoute: typeof SignupRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/login": {
-      id: "/login";
-      path: "/login";
-      fullPath: "/login";
-      preLoaderRoute: typeof LoginRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/about": {
-      id: "/about";
-      path: "/about";
-      fullPath: "/about";
-      preLoaderRoute: typeof AboutRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/_app": {
-      id: "/_app";
-      path: "";
-      fullPath: "";
-      preLoaderRoute: typeof AppRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/_app/settings": {
-      id: "/_app/settings";
-      path: "/settings";
-      fullPath: "/settings";
-      preLoaderRoute: typeof AppSettingsRouteImport;
-      parentRoute: typeof AppRoute;
-    };
-    "/_app/products": {
-      id: "/_app/products";
-      path: "/products";
-      fullPath: "/products";
-      preLoaderRoute: typeof AppProductsRouteImport;
-      parentRoute: typeof AppRoute;
-    };
-    "/_app/dashboard": {
-      id: "/_app/dashboard";
-      path: "/dashboard";
-      fullPath: "/dashboard";
-      preLoaderRoute: typeof AppDashboardRouteImport;
-      parentRoute: typeof AppRoute;
-    };
-    "/_app/settings/": {
-      id: "/_app/settings/";
-      path: "/";
-      fullPath: "/settings/";
-      preLoaderRoute: typeof AppSettingsIndexRouteImport;
-      parentRoute: typeof AppSettingsRoute;
-    };
-    "/_app/settings/profile": {
-      id: "/_app/settings/profile";
-      path: "/profile";
-      fullPath: "/settings/profile";
-      preLoaderRoute: typeof AppSettingsProfileRouteImport;
-      parentRoute: typeof AppSettingsRoute;
-    };
-    "/_app/settings/password": {
-      id: "/_app/settings/password";
-      path: "/password";
-      fullPath: "/settings/password";
-      preLoaderRoute: typeof AppSettingsPasswordRouteImport;
-      parentRoute: typeof AppSettingsRoute;
-    };
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/products': {
+      id: '/_app/products'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof AppProductsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/settings/': {
+      id: '/_app/settings/'
+      path: '/'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof AppSettingsIndexRouteImport
+      parentRoute: typeof AppSettingsRoute
+    }
+    '/_app/settings/profile': {
+      id: '/_app/settings/profile'
+      path: '/profile'
+      fullPath: '/settings/profile'
+      preLoaderRoute: typeof AppSettingsProfileRouteImport
+      parentRoute: typeof AppSettingsRoute
+    }
+    '/_app/settings/password': {
+      id: '/_app/settings/password'
+      path: '/password'
+      fullPath: '/settings/password'
+      preLoaderRoute: typeof AppSettingsPasswordRouteImport
+      parentRoute: typeof AppSettingsRoute
+    }
   }
 }
 
 interface AppSettingsRouteChildren {
-  AppSettingsPasswordRoute: typeof AppSettingsPasswordRoute;
-  AppSettingsProfileRoute: typeof AppSettingsProfileRoute;
-  AppSettingsIndexRoute: typeof AppSettingsIndexRoute;
+  AppSettingsPasswordRoute: typeof AppSettingsPasswordRoute
+  AppSettingsProfileRoute: typeof AppSettingsProfileRoute
+  AppSettingsIndexRoute: typeof AppSettingsIndexRoute
 }
 
 const AppSettingsRouteChildren: AppSettingsRouteChildren = {
   AppSettingsPasswordRoute: AppSettingsPasswordRoute,
   AppSettingsProfileRoute: AppSettingsProfileRoute,
   AppSettingsIndexRoute: AppSettingsIndexRoute,
-};
+}
 
 const AppSettingsRouteWithChildren = AppSettingsRoute._addFileChildren(
   AppSettingsRouteChildren,
-);
+)
 
 interface AppRouteChildren {
-  AppDashboardRoute: typeof AppDashboardRoute;
-  AppProductsRoute: typeof AppProductsRoute;
-  AppSettingsRoute: typeof AppSettingsRouteWithChildren;
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppProductsRoute: typeof AppProductsRoute
+  AppSettingsRoute: typeof AppSettingsRouteWithChildren
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppProductsRoute: AppProductsRoute,
   AppSettingsRoute: AppSettingsRouteWithChildren,
-};
+}
 
-const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren);
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -278,7 +278,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
-};
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()

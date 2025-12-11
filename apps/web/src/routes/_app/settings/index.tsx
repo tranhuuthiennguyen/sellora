@@ -2,102 +2,54 @@ import {
   Select,
   SelectContent,
   SelectGroup,
-  SelectLabel,
+  SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { getAllTimeZones } from "@sellora/shared";
 
 export const Route = createFileRoute("/_app/settings/")({
   component: RouteComponent,
 });
 
-export const getUTCOffset = (timeZone: string, date = new Date()) => {
-  const utcDate = new Date(date.toLocaleString("en-US", { timeZone: "UTC" }));
-  const tzDate = new Date(date.toLocaleString("en-US", { timeZone: timeZone }));
-
-  const offsetMs = tzDate.getTime() - utcDate.getTime();
-
-  return offsetMs / 3600000;
-};
-
-export interface RawTimeZone {
-  region: string;
-  offset: number;
-}
-
-export class TimeZone implements RawTimeZone {
-  region: string;
-  offset: number;
-
-  public constructor(region: string, offset: number) {
-    this.region = region;
-    this.offset = offset;
-  }
-
-  public getString() {
-    const a = this.region.split("/");
-    return a
-      .map((v) => {
-        return v ? v.split("_").join(" ") : null;
-      })
-      .join("/");
-  }
-}
-
-export const filterTimeZone = (tzList: TimeZone[]) => {
-  const unique = tzList.filter(
-    (tz, index, self) =>
-      index === self.findIndex((t) => t.region === tz.region),
-  );
-  const filtered = unique.filter((v) => {
-    return !v.region.startsWith("Etc");
-  });
-  filtered.sort((a, b) => {
-    if (a.offset > b.offset) return 1;
-    if (a.offset < b.offset) return -1;
-    return 0;
-  });
-
-  return filtered;
-};
-
 export const LocalSetting = () => {
-  const tzList = Intl.supportedValuesOf("timeZone");
-  console.log(tzList);
-  let tzWithOffsetList: TimeZone[] = [];
+  const [parentRef, setParentRef] = useState<HTMLDivElement | null>(null);
 
-  for (const tz of tzList) {
-    const offset = getUTCOffset(tz);
-    tzWithOffsetList.push(new TimeZone(tz, offset));
-  }
+  const tzList = getAllTimeZones();
 
-  tzWithOffsetList = filterTimeZone(tzWithOffsetList);
+  const rowVirtualizer = useVirtualizer({
+    count: tzList.length,
+    getScrollElement: () => parentRef,
+    estimateSize: () => 1,
+  });
+
   return (
-    <div className="flex flex-row">
-      <div className="w-sm">Local</div>
-      <div className="w-max">
-        <div>
-          Time zone
-          {tzWithOffsetList.map((tz, idx) => {
-            return (
-              <li key={idx}>
-                {tz.offset} | {tz.getString()}
-              </li>
-            );
-          })}
-          {/* {tzList[0]} */}
-          <Select>
-            <SelectTrigger>
-              <SelectValue placeholder="Select a time zone" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Time zone</SelectLabel>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
+    <div className="flex flex-row border-b border-gray-500">
+      <div className="w-lg border-r border-gray-500 p-6">Local</div>
+      <div className="w-full p-6">
+        <div>Timezone</div>
+        <Select>
+          <SelectTrigger className="bg-[#0d0d0d] w-full">
+            <SelectValue placeholder="Select a time zone" />
+          </SelectTrigger>
+          <SelectContent ref={setParentRef} className="bg-[#0d0d0d] text-white">
+            <SelectGroup>
+              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                return (
+                  <SelectItem
+                    key={virtualRow.index}
+                    value={tzList[virtualRow.index].region}
+                  >
+                    {tzList[virtualRow.index].getFormattedString()}
+                  </SelectItem>
+                );
+              })}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );
