@@ -9,7 +9,7 @@ export const generateAccessToken = async (
       id: payload.id,
     },
     {
-      expiresIn: "15m",
+      expiresIn: 60 * 10,
     },
   );
 };

@@ -15,7 +15,12 @@ export const Route = createFileRoute("/_app/settings/")({
   component: RouteComponent,
 });
 
-export const LocalSetting = () => {
+type Props = {
+  value?: string;
+  onChange: (timeZone: string) => void;
+};
+
+export const LocalSetting = ({ value, onChange }: Props) => {
   const [parentRef, setParentRef] = useState<HTMLDivElement | null>(null);
 
   const tzList = getAllTimeZones();
@@ -31,7 +36,7 @@ export const LocalSetting = () => {
       <div className="w-lg border-r border-gray-500 p-6">Local</div>
       <div className="w-full p-6">
         <div>Timezone</div>
-        <Select>
+        <Select value={value} onValueChange={onChange}>
           <SelectTrigger className="bg-[#0d0d0d] w-full">
             <SelectValue placeholder="Select a time zone" />
           </SelectTrigger>
@@ -56,9 +61,18 @@ export const LocalSetting = () => {
 };
 
 function RouteComponent() {
+  // const form = useSettingsForm()
+  // if (!form?.draft) {
+  //   return null
+  // }
+
   return (
     <div className="flex flex-col">
-      <LocalSetting></LocalSetting>
+      <LocalSetting
+        // value={form.draft.timezone}
+        // onChange={(v) => form?.updateField("timezone", v)}
+        onChange={() => {}}
+      />
     </div>
   );
 }

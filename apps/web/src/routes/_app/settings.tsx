@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useSettingsForm } from "@/hooks/useSettingsForm";
 import {
   createFileRoute,
   Link,
@@ -11,13 +12,18 @@ export const Route = createFileRoute("/_app/settings")({
 });
 
 function Settings() {
+  const form = useSettingsForm();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+  };
   return (
-    <div>
+    <form onSubmit={handleSubmit}>
       <SettingsHeader />
       <div>
         <Outlet />
       </div>
-    </div>
+    </form>
   );
 }
 

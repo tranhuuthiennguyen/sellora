@@ -36,13 +36,14 @@ function AppLayout() {
 
   const navigate = useNavigate();
 
+  if (!isAuthenticated) {
+    navigate({ to: "/login" });
+  }
+
   if (isBootstrapping) {
     return <div className="text-white p-6">Loading…</div>;
   }
 
-  if (!isAuthenticated) {
-    navigate({ to: "/login" });
-  }
   return (
     <div className="h-screen flex flex-col bg-tuatara text-gray-200">
       {/* Main content area */}

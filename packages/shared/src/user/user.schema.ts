@@ -18,6 +18,7 @@ export const UserSchema = Type.Object({
   city: Type.Optional(Type.String()),
   zipCode: Type.Optional(Type.String()),
   streetAddress: Type.Optional(Type.String()),
+  timezone: Type.String(),
   createdAt: Type.String({ format: "date-time" }),
   updatedAt: Type.String({ format: "date-time" }),
 });

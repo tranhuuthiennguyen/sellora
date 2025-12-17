@@ -24,9 +24,9 @@ const authRouter: FastifyPluginAsyncTypebox = async (
     handler: loginHandler,
   });
   // LOGOUT
-  fastify.get("/logout", {
+  fastify.post("/logout", {
     schema: {},
-    onRequest: fastify.authenticateUser,
+    // onRequest: fastify.authenticateUser,
     handler: logoutHandler,
   });
   // REFRESH TOKEN

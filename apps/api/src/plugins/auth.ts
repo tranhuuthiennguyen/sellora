@@ -51,6 +51,7 @@ export default fp((fastify: FastifyInstance, _: unknown, done: () => void) => {
       try {
         payload = await request.jwtVerify();
       } catch (error) {
+        fastify.log.error(error);
         return reply.code(401).send({
           success: false,
           message: ERRORS.unauthorizedAccess.message,

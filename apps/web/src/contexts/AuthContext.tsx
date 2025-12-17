@@ -2,12 +2,14 @@ import { api } from "@/lib/api";
 import {
   createContext,
   useContext,
-  useEffect,
   useLayoutEffect,
+  useMemo,
   useState,
   type ReactNode,
 } from "react";
-import { type UserEntity } from "@sellora/shared";
+import { ERRORS, type UserEntity } from "@sellora/shared";
+import { authApi } from "@/api/auth";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 declare module "axios" {
   export interface AxiosRequestConfig {
@@ -18,18 +20,14 @@ declare module "axios" {
 interface AuthContextType {
   user: UserEntity | null;
   accessToken: string | null;
-  register: (
-    email: string,
-    password: string,
-  ) => Promise<{ success?: boolean; message?: string }>;
-  login: (
-    email: string,
-    password: string,
-  ) => Promise<{ success?: boolean; message?: string }>;
-  logout: () => void;
+  register: (email: string, password: string) => Promise<any>;
+  login: (email: string, password: string) => Promise<any>;
+  logout: () => Promise<any>;
   isAuthenticated: boolean;
   isBootstrapping: boolean;
 }
+
+// type AuthStatus = "unknown" | "authenticated" | "unauthenticated"
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -42,76 +40,56 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<UserEntity | null>(null);
+  const queryClient = useQueryClient();
+
   const [token, setToken] = useState<string | null>(null);
-  const [isBootstrapping, setIsBootstrapping] = useState(true);
 
-  const register = async (email: string, password: string) => {
-    try {
-      const res = await api.post("/auth/register", { email, password });
-      console.log(res);
-      return {
-        success: true,
-      };
-    } catch (error: any) {
-      return {
-        success: false,
-        message: error.response?.data?.message,
-      };
-    }
-  };
+  /* -----------------------------
+   * Boostrap auth (refresh + me)
+   * ----------------------------- */
+  const bootstrapQuery = useQuery({
+    queryKey: ["auth", "bootstrap"],
+    queryFn: async () => {
+      const { accessToken } = await authApi.refresh();
+      setToken(accessToken);
 
-  const login = async (email: string, password: string) => {
-    try {
-      const res = await api.post("/auth/login", { email, password });
-      // useEffect(() => {})
-      setToken(res.data.accessToken);
-      setUser(res.data.user);
+      const { user } = await authApi.me();
+      return user;
+    },
+    retry: true,
+    staleTime: Infinity,
+  });
 
-      return {
-        success: true,
-      };
-    } catch (error: any) {
-      return {
-        success: false,
-        message: error.response?.data?.message,
-      };
-    }
-  };
+  /* ----------------------------------
+   * Mutations
+   * ---------------------------------- */
+  const loginMutation = useMutation({
+    mutationFn: ({ email, password }: { email: string; password: string }) =>
+      authApi.login(email, password),
+    onSuccess: ({ accessToken, user }) => {
+      setToken(accessToken);
+      queryClient.setQueryData(["auth", "user"], user);
+    },
+  });
 
-  const logout = async () => {
-    try {
-      await api.post("/auth/logout");
-    } catch (error) {
+  const registerMutation = useMutation({
+    mutationFn: ({ email, password }: { email: string; password: string }) =>
+      authApi.register(email, password),
+  });
+
+  const logoutMutation = useMutation({
+    mutationFn: authApi.logout,
+    onSuccess: () => {
       setToken(null);
-      setUser(null);
-    }
-  };
+      queryClient.clear();
+    },
+  });
 
-  const isAuthenticated = !!token;
-
-  useEffect(() => {
-    const init = async () => {
-      try {
-        const res = await api.get("/auth/refresh");
-        const token = res.data.accessToken;
-        setToken(token);
-
-        const me = await api.get("/auth/me");
-        setUser(me.data.user);
-      } catch {
-        setToken(null);
-        setUser(null);
-      } finally {
-        setIsBootstrapping(false);
-      }
-    };
-
-    init();
-  }, []);
-
+  /* ----------------------------------
+   * Axios interceptors
+   * ---------------------------------- */
   useLayoutEffect(() => {
-    const authInterceptor = api.interceptors.request.use((config) => {
+    const reqInterceptor = api.interceptors.request.use((config) => {
       config.headers.Authorization =
         !config._retry && token
           ? `Bearer ${token}`
@@ -120,31 +98,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return config;
     });
 
-    return () => {
-      api.interceptors.request.eject(authInterceptor);
-    };
-  }, [token]);
-
-  useLayoutEffect(() => {
-    const refreshInterceptor = api.interceptors.response.use(
-      (response) => response,
-      async (error: any) => {
-        const originalRequest = error.config;
+    const resInterceptor = api.interceptors.response.use(
+      (res) => res,
+      async (error) => {
+        const original = error.config;
 
         if (
-          error.response.status === 401 &&
-          error.response.data.message === "Unauthorized"
+          error.response?.status === 401 &&
+          error.response?.data.message === ERRORS.unauthorizedAccess.message
+          // !original._retry &&
+          // !original.url?.includes("/auth/refresh")
         ) {
           try {
-            const response = await api.get("/auth/refresh");
-            setToken(response.data.accessToken);
+            const { accessToken } = await authApi.refresh();
+            setToken(accessToken);
 
-            originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
-            originalRequest._retry = true;
+            original._retry = true;
+            original.headers.Authorization = `Bearer ${accessToken}`;
 
-            return api(originalRequest);
+            return api(original);
           } catch {
             setToken(null);
+            queryClient.clear();
           }
         }
 
@@ -153,23 +128,58 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     );
 
     return () => {
-      api.interceptors.response.eject(refreshInterceptor);
+      api.interceptors.request.eject(reqInterceptor);
+      api.interceptors.response.eject(resInterceptor);
     };
-  }, [token]);
+  }, [token, queryClient]);
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        accessToken: token,
-        register,
-        login,
-        logout,
-        isAuthenticated,
-        isBootstrapping,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+  /* ----------------------------------
+   * Derived state
+   * ---------------------------------- */
+  const user = bootstrapQuery.data ?? null;
+
+  const value = useMemo<AuthContextType>(
+    () => ({
+      user,
+      accessToken: token,
+      isAuthenticated: !!token,
+      isBootstrapping: bootstrapQuery.isLoading,
+      register: async (email, password) => {
+        try {
+          await registerMutation.mutateAsync({ email, password });
+          return { success: true };
+        } catch (error: any) {
+          return {
+            success: false,
+            message: error.response?.data?.message,
+          };
+        }
+      },
+      login: async (email, password) => {
+        try {
+          await loginMutation.mutateAsync({ email, password });
+          return { success: true };
+        } catch (error: any) {
+          return {
+            success: false,
+            message: error.response?.data?.message,
+          };
+        }
+      },
+      logout: async () => {
+        try {
+          await logoutMutation.mutateAsync();
+          return { success: true };
+        } catch (error: any) {
+          return {
+            success: false,
+            message: error.response?.data?.message,
+          };
+        }
+      },
+    }),
+    [user, token, bootstrapQuery.isLoading],
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
