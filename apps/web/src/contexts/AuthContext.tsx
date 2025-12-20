@@ -1,4 +1,4 @@
-import { api } from "@/lib/api";
+import { api } from "@/api";
 import {
   createContext,
   useContext,
@@ -17,7 +17,7 @@ declare module "axios" {
   }
 }
 
-interface AuthContextType {
+type AuthContextType = {
   user: UserEntity | null;
   accessToken: string | null;
   register: (email: string, password: string) => Promise<any>;
@@ -25,7 +25,7 @@ interface AuthContextType {
   logout: () => Promise<any>;
   isAuthenticated: boolean;
   isBootstrapping: boolean;
-}
+};
 
 // type AuthStatus = "unknown" | "authenticated" | "unauthenticated"
 

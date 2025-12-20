@@ -1,14 +1,31 @@
-import { TAnySchema } from "@sinclair/typebox";
+import { TSchema } from "@sinclair/typebox";
 import { TypeCompiler } from "@sinclair/typebox/compiler";
+import { UserSchema } from "../user/user.schema.js";
 
-export const validateSchema = (schema: TAnySchema, data: any) => {
-  const validator = TypeCompiler.Compile(schema);
+export function validateValue<T>(
+  schema: TSchema,
+  value: unknown,
+): string | null {
+  const C = TypeCompiler.Compile(schema);
+  const ok = C.Check(value);
 
-  const isValid = validator.Check(data);
+  if (ok) return null;
 
-  if (!isValid) {
-    for (const error of validator.Errors(data)) {
-      console.log(error.message);
-    }
-  }
+  const error = [...C.Errors(value)][0];
+  return error?.message ?? "Invalid value";
+}
+
+export const UserFieldSchemas = {
+  email: UserSchema.properties.email,
+  username: UserSchema.properties.username,
+  displayName: UserSchema.properties.displayName,
+  bio: UserSchema.properties.bio,
+  currencyType: UserSchema.properties.currencyType,
+  profilePictureUrl: UserSchema.properties.profilePictureUrl,
+  country: UserSchema.properties.country,
+  state: UserSchema.properties.state,
+  city: UserSchema.properties.city,
+  zipCode: UserSchema.properties.zipCode,
+  streetAddress: UserSchema.properties.streetAddress,
+  timezone: UserSchema.properties.timezone,
 };

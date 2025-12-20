@@ -38,9 +38,9 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-screen w-full bg-[#111] text-white overflow-hidden">
+    <div className="flex h-screen w-full text-white overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-60 bg-black border-r border-neutral-800 flex flex-col">
+      <aside className="w-60 bg-[#0d0d0d] border-r border-neutral-800 flex flex-col">
         <div className="px-4 py-6 font-semibold text-lg tracking-tight">
           YourLogo
         </div>

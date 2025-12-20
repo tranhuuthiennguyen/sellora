@@ -21,3 +21,10 @@ export const bootstrapAuthQuery = () => ({
   staleTime: Infinity,
   gcTime: Infinity,
 });
+
+export const meQuery = () => ({
+  queryKey: ["me"],
+  queryFn: async () => {
+    return await authApi.me();
+  },
+});

@@ -1,78 +1,75 @@
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { useVirtualizer } from "@tanstack/react-virtual";
-import { getAllTimeZones } from "@sellora/shared";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useAppForm } from "@/hooks/form";
+import SettingsNavBar from "@/components/settings/SettingsNavBar";
+import { usersApi } from "@/api/users";
+import type { UpdateUserDto } from "@sellora/shared";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import { meQuery } from "@/api/auth/queries";
 
 export const Route = createFileRoute("/_app/settings/")({
   component: RouteComponent,
 });
 
-type Props = {
-  value?: string;
-  onChange: (timeZone: string) => void;
-};
+function RouteComponent() {
+  const queryClient = useQueryClient();
+  const { data } = useQuery(meQuery());
 
-export const LocalSetting = ({ value, onChange }: Props) => {
-  const [parentRef, setParentRef] = useState<HTMLDivElement | null>(null);
+  const { user } = useAuth();
+  if (!user) throw new Error("WHERE TF IS USER????");
 
-  const tzList = getAllTimeZones();
+  const mutation = useMutation({
+    mutationFn: async (payload: UpdateUserDto) => {
+      return await usersApi.patch(user.id, payload);
+    },
+    onSuccess: () => {
+      toast.success("User's details has been updated successfully.");
+      queryClient.invalidateQueries({ queryKey: ["me"] });
+    },
+  });
 
-  const rowVirtualizer = useVirtualizer({
-    count: tzList.length,
-    getScrollElement: () => parentRef,
-    estimateSize: () => 1,
+  const form = useAppForm({
+    defaultValues: {
+      timezone: data?.user.timezone ?? "",
+      currencyType: data?.user.currencyType ?? "",
+    },
+    onSubmit: ({ value }) => {
+      mutation.mutate(value);
+    },
   });
 
   return (
-    <div className="flex flex-row border-b border-gray-500">
-      <div className="w-lg border-r border-gray-500 p-6">Local</div>
-      <div className="w-full p-6">
-        <div>Timezone</div>
-        <Select value={value} onValueChange={onChange}>
-          <SelectTrigger className="bg-[#0d0d0d] w-full">
-            <SelectValue placeholder="Select a time zone" />
-          </SelectTrigger>
-          <SelectContent ref={setParentRef} className="bg-[#0d0d0d] text-white">
-            <SelectGroup>
-              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-                return (
-                  <SelectItem
-                    key={virtualRow.index}
-                    value={tzList[virtualRow.index].region}
-                  >
-                    {tzList[virtualRow.index].getFormattedString()}
-                  </SelectItem>
-                );
-              })}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        form.handleSubmit();
+      }}
+    >
+      <div className="flex justify-between border-b border-gray-500 p-6">
+        <SettingsNavBar />
+        <form.AppForm>
+          <form.SubcribeButton label="Update settings" />
+        </form.AppForm>
       </div>
-    </div>
-  );
-};
-
-function RouteComponent() {
-  // const form = useSettingsForm()
-  // if (!form?.draft) {
-  //   return null
-  // }
-
-  return (
-    <div className="flex flex-col">
-      <LocalSetting
-        // value={form.draft.timezone}
-        // onChange={(v) => form?.updateField("timezone", v)}
-        onChange={() => {}}
-      />
-    </div>
+      <div className="flex flex-col">
+        <section className="grid grid-cols-10 border-b border-gray-500">
+          <span className="col-span-3 border-r border-gray-500">
+            <h1 className="p-6">Local</h1>
+          </span>
+          <span className="col-span-7">
+            <form.AppField
+              name="timezone"
+              children={(field) => <field.TimeZoneSettingField />}
+            />
+            <form.AppField
+              name="currencyType"
+              children={(field) => <field.CurrencySettingField />}
+            />
+          </span>
+        </section>
+      </div>
+    </form>
   );
 }

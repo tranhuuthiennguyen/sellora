@@ -26,6 +26,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SettingsFormProvider } from "@/contexts/SettingsFormContext";
+import { Toaster } from "@/components/ui/sonner";
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
@@ -51,8 +53,11 @@ function AppLayout() {
         <Sidebar />
 
         <main className="flex-1 overflow-y-auto">
-          <Outlet />
+          <SettingsFormProvider>
+            <Outlet />
+          </SettingsFormProvider>
         </main>
+        <Toaster />
       </div>
     </div>
   );
@@ -78,7 +83,7 @@ export function Sidebar() {
   if (!user) return null;
 
   return (
-    <aside className="w-45 h-screen bg-[#0d0d0d] border-r border-neutral-800 overflow-y-auto flex flex-col">
+    <aside className="w-45 h-screen bg-main-bg border-r border-neutral-800 overflow-y-auto flex flex-col">
       {/* Top Bar */}
       <div className="border-b border-gray-500 text-4xl font-semibold text-center p-4">
         <Link to={"/"}>Sellora</Link>
@@ -119,7 +124,10 @@ export function Sidebar() {
               className="w-48 bg-neutral-900 border-neutral-700"
             >
               <DropdownMenuItem>
-                <Link to="/" className="flex items-center gap-2 w-full">
+                <Link
+                  to="/"
+                  className="flex items-center text-white gap-2 w-full"
+                >
                   <User size={16} /> Profile
                 </Link>
               </DropdownMenuItem>

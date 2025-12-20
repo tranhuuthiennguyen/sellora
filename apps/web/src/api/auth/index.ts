@@ -1,4 +1,4 @@
-import { api } from "@/lib/api";
+import { api } from "@/api";
 import type { UserEntity } from "@sellora/shared";
 
 export const authApi = {
