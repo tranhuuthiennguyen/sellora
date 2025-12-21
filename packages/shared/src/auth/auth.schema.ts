@@ -17,3 +17,17 @@ export const LoginResponseSchema = {
   401: BaseResponseSchema,
   404: BaseResponseSchema,
 };
+
+export const ChangePasswordInputSchema = Type.Object({
+  oldPassword: PasswordSchema,
+  newPassword: PasswordSchema,
+});
+
+export const ChangePasswordResponseSchema = {
+  200: Type.Object({
+    success: Type.Boolean(),
+    message: Type.String(),
+  }),
+  400: BaseResponseSchema,
+  401: BaseResponseSchema,
+};

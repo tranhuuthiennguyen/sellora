@@ -3,6 +3,7 @@ import { handleServerError } from "@helpers/errors.helper";
 import {
   checkUserExists,
   createUser,
+  generateUniqueUsername,
   getUserById,
 } from "@modules/users/users.service";
 import { compareHash, genSalt } from "@utils/auth";
@@ -11,23 +12,25 @@ import {
   FastifyRequestTypeBox,
 } from "@/schemas/common.schema";
 import { CreateUserSchema } from "@modules/users/users.schema";
-import { LoginSchema } from "@modules/auth/auth.schema";
+import { ChangePasswordSchema, LoginSchema } from "@modules/auth/auth.schema";
 import {
   generateAccessToken,
   generateRefreshToken,
+  updatePassword,
+  verifyPassword,
 } from "@modules/auth/auth.service";
 import { CreateUserDto, UserEntity } from "@sellora/shared/user";
 import { ERRORS } from "@sellora/shared/lib";
-import { LoginInputDto } from "@sellora/shared/auth";
+import { ChangePasswordDto, LoginInputDto } from "@sellora/shared/auth";
 import { EnvSchema } from "@/utils/validateEnv";
+import { HASH_SALT, STANDARD } from "@/constants";
 
 export const registerHandler = async (
   request: FastifyRequestTypeBox<typeof CreateUserSchema>,
   reply: FastifyReplyTypeBox<typeof CreateUserSchema>,
 ) => {
   try {
-    const { email, password, username, currencyType } =
-      request.body as CreateUserDto;
+    const { email, password } = request.body as CreateUserDto;
 
     const user = await checkUserExists(request.server.db, { email });
     if (user) {
@@ -37,13 +40,14 @@ export const registerHandler = async (
       });
     }
 
-    const hashPwd = await genSalt(10, password);
+    const hashPwd = await genSalt(HASH_SALT, password);
+
+    const username = await generateUniqueUsername(request.server.db, email);
 
     const payload = {
       email: email,
       passwordHash: hashPwd,
       username: username,
-      currencyType: currencyType,
     };
     const createdUser: UserEntity = await createUser(
       request.server.db,
@@ -188,17 +192,47 @@ export const restoreSessionHandler = async (
 
     const user = await getUserById(request.server.db, decoded.id);
 
-    // if (!user) {
-    //   return reply.code(401).send({
-    //     success: false,
-    //     message: ERRORS.unauthorizedAccess.message,
-    //   });
-    // }
-
     return reply.code(200).send({
       success: true,
       user,
     });
+  } catch (error) {
+    return handleServerError(reply, error);
+  }
+};
+
+export const changePasswordHandler = async (
+  request: FastifyRequestTypeBox<typeof ChangePasswordSchema>,
+  reply: FastifyReplyTypeBox<typeof ChangePasswordSchema>,
+) => {
+  try {
+    const { oldPassword, newPassword } = request.body as ChangePasswordDto;
+    const userId = request.currentUser.id as number;
+
+    const res = await verifyPassword(request.server.db, userId, oldPassword);
+
+    if (res === null) {
+      return reply.code(404).send({
+        success: false,
+        message: ERRORS.userNotExists.message,
+      });
+    }
+
+    if (res === false) {
+      // incorrect
+      return reply.code(400).send({
+        success: false,
+        message: "Incorrect Password",
+      });
+    } else {
+      // ==== correct old password prompt -> save new valid password
+      const res = await updatePassword(request.server.db, userId, newPassword);
+
+      return reply.code(200).send({
+        success: true,
+        message: STANDARD.OK,
+      });
+    }
   } catch (error) {
     return handleServerError(reply, error);
   }

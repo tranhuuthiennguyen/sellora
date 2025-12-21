@@ -8,9 +8,19 @@ export const UserSchema = Type.Object({
     format: "email",
     errorMessage: "Invalid Email",
   }),
-  username: Type.String(),
-  displayName: Type.Optional(Type.String()),
-  bio: Type.Optional(Type.String()),
+  username: Type.String({
+    minLength: 1,
+  }),
+  displayName: Type.Optional(
+    Type.String({
+      minLength: 1,
+    }),
+  ),
+  bio: Type.Optional(
+    Type.String({
+      maxLength: 500,
+    }),
+  ),
   currencyType: Type.String(),
   profilePictureUrl: Type.Optional(Type.String()),
   country: Type.Optional(Type.String()),
@@ -18,6 +28,7 @@ export const UserSchema = Type.Object({
   city: Type.Optional(Type.String()),
   zipCode: Type.Optional(Type.String()),
   streetAddress: Type.Optional(Type.String()),
+  timezone: Type.String(),
   createdAt: Type.String({ format: "date-time" }),
   updatedAt: Type.String({ format: "date-time" }),
 });
@@ -40,12 +51,6 @@ export const GetAllUsersResponseSchema = {
 export const CreateUserInputSchema = Type.Object({
   email: EmailSchema,
   password: PasswordSchema,
-  username: Type.String({ minLength: 3 }),
-  currencyType: Type.String({
-    minLength: 3,
-    maxLength: 10,
-    default: "USD",
-  }),
 });
 
 export const CreateUserResponseSchema = {
@@ -58,7 +63,9 @@ export const CreateUserResponseSchema = {
   500: BaseResponseSchema,
 };
 
-export const UpdateUserInputSchema = Type.Partial(UserSchema);
+export const UpdateUserInputSchema = Type.Partial(
+  Type.Omit(UserSchema, ["id", "createdAt", "updatedAt"]),
+);
 
 export const UpdateUserResponseSchema = {
   200: Type.Object({

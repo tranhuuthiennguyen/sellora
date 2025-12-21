@@ -1,12 +1,13 @@
 import { CreateUserSchema } from "@modules/users/users.schema";
 import {
+  changePasswordHandler,
   loginHandler,
   logoutHandler,
   refreshTokenHandler,
   registerHandler,
   restoreSessionHandler,
 } from "@modules/auth/auth.controller";
-import { LoginSchema } from "@modules/auth/auth.schema";
+import { ChangePasswordSchema, LoginSchema } from "@modules/auth/auth.schema";
 import { FastifyPluginAsyncTypebox } from "@fastify/type-provider-typebox";
 import { FastifyTypeBox } from "@/schemas/common.schema";
 
@@ -24,9 +25,9 @@ const authRouter: FastifyPluginAsyncTypebox = async (
     handler: loginHandler,
   });
   // LOGOUT
-  fastify.get("/logout", {
+  fastify.post("/logout", {
     schema: {},
-    onRequest: fastify.authenticateUser,
+    // onRequest: fastify.authenticateUser,
     handler: logoutHandler,
   });
   // REFRESH TOKEN
@@ -39,6 +40,12 @@ const authRouter: FastifyPluginAsyncTypebox = async (
     schema: {},
     onRequest: fastify.authenticateUser,
     handler: restoreSessionHandler,
+  });
+
+  fastify.patch("/password", {
+    schema: ChangePasswordSchema,
+    onRequest: fastify.authenticateUser,
+    handler: changePasswordHandler,
   });
 };
 

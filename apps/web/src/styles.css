@@ -20,10 +20,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
+/* code {
   font-family:
     source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
-}
+} */
 
 :root {
   --background: oklch(1 0 0);
@@ -60,7 +60,7 @@ code {
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.871 0.006 286.286);
   /* font */
-  --font-size: 22px;
+  --font-size: 20px;
   --font-weight: 300;
 }
 
@@ -138,6 +138,7 @@ code {
   --color-sidebar-ring: var(--sidebar-ring);
   --color-lavender-rose: #ff90e8;
   --color-tuatara: #242423;
+  --color-main-bg: #0d0d0d;
 }
 
 @layer base {
@@ -146,5 +147,8 @@ code {
   }
   body {
     @apply bg-background text-foreground;
+  }
+  button, [role="button"] {
+    cursor: pointer;
   }
 }

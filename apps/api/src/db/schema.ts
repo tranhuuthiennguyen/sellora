@@ -25,6 +25,7 @@ export const users = pgTable("users", {
   city: varchar("city", { length: 50 }),
   zipCode: varchar("zip_code", { length: 20 }),
   streetAddress: varchar("street_address", { length: 100 }),
+  timezone: varchar("timezone").default("Pacific Time (US & Canada)"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });

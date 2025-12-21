@@ -32,10 +32,9 @@ export const createUser = async (
     email: string;
     passwordHash: string;
     username: string;
-    currencyType: string;
   },
 ): Promise<UserEntity> => {
-  const { email, passwordHash, username, currencyType } = payload;
+  const { email, passwordHash, username } = payload;
   const createdUser = (
     await db
       .insert(users)
@@ -43,7 +42,6 @@ export const createUser = async (
         email: email,
         passwordHash: passwordHash,
         username: username,
-        currencyType: currencyType,
       })
       .returning({
         id: users.id,
@@ -58,6 +56,7 @@ export const createUser = async (
         city: users.city,
         zipCode: users.zipCode,
         streetAddress: users.streetAddress,
+        timezone: users.timezone,
         createdAt: users.createdAt,
         updatedAt: users.updatedAt,
       })
@@ -115,5 +114,38 @@ export const deleteUserById = async (
     return await db.delete(users).where(eq(users.id, userId)).returning();
   } catch (error) {
     throw new Error(`Drizzle Error: ${error}`);
+  }
+};
+
+export const emailToBaseUsername = (email: string) => {
+  const username = email.split("@")[0]!;
+
+  return username
+    ?.toLocaleLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+};
+
+export const generateUniqueUsername = async (
+  db: PostgresJsDatabase<typeof schema>,
+  email: string,
+) => {
+  const base = emailToBaseUsername(email);
+
+  let username = base;
+  let counter = 1;
+
+  while (true) {
+    const exists = (
+      await db
+        .selectDistinct({ username: users.username })
+        .from(users)
+        .where(eq(users.username, username))
+    )[0];
+
+    if (!exists) return username;
+
+    username = `${base}-${counter}`;
+    counter++;
   }
 };
