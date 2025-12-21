@@ -28,4 +28,9 @@ export const authApi = {
   logout: async () => {
     await api.post("/auth/logout");
   },
+
+  changePassword: async (oldPassword: string, newPassword: string) => {
+    const res = await api.patch("/auth/password", { oldPassword, newPassword });
+    return res.data;
+  },
 };

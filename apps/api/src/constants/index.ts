@@ -24,3 +24,5 @@ export const STANDARD = {
     statusCode: 206,
   },
 } as const;
+
+export const HASH_SALT = 10;

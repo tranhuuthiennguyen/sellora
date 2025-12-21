@@ -1,19 +1,43 @@
+import { authApi } from "@/api/auth";
 import SettingsNavBar from "@/components/settings/SettingsNavBar";
 import { useAppForm } from "@/hooks/form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/settings/password")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationKey: ["password", "update"],
+    mutationFn: async ({
+      oldPassword,
+      newPassword,
+    }: {
+      oldPassword: string;
+      newPassword: string;
+    }) => {
+      const res = await authApi.changePassword(oldPassword, newPassword);
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["password", "update"] });
+      toast.info("Password updated!");
+    },
+    onError: (error: any) => {
+      toast.error(error.response.data.message);
+    },
+  });
   const form = useAppForm({
     defaultValues: {
       oldPassword: "",
       newPassword: "",
     },
-    onSubmit: ({ value }) => {
-      console.log(value);
+    onSubmit: async ({ value }) => {
+      await mutation.mutate(value);
     },
   });
   return (
@@ -41,6 +65,9 @@ function RouteComponent() {
               name="newPassword"
               children={(field) => <field.PasswordField label="New password" />}
             />
+            <form.AppForm>
+              <form.SubcribeButton label="Change password" />
+            </form.AppForm>
           </span>
         </section>
       </div>

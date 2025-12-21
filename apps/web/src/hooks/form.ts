@@ -4,11 +4,15 @@ import { createFormHook } from "@tanstack/react-form";
 import { fieldContext, formContext } from "./form-context.tsx";
 
 const TextField = lazy(() => import("../components/ui/text-field.tsx"));
+const TextFieldRequired = lazy(
+  () => import("../components/ui/text-field-required.tsx"),
+);
 const TextAreaField = lazy(() => import("../components/ui/textarea-field.tsx"));
 const PasswordField = lazy(() => import("../components/ui/password-field.tsx"));
 const SubcribeButton = lazy(
   () => import("../components/ui/subcribe-button.tsx"),
 );
+const SubmitButton = lazy(() => import("../components/ui/submit-button.tsx"));
 const CurrencySettingField = lazy(
   () => import("../components/settings/CurrencySetting.tsx"),
 );
@@ -21,6 +25,7 @@ export const { useAppForm, withForm } = createFormHook({
   formContext,
   fieldComponents: {
     TextField,
+    TextFieldRequired,
     TextAreaField,
     PasswordField,
     CurrencySettingField,
@@ -28,5 +33,6 @@ export const { useAppForm, withForm } = createFormHook({
   },
   formComponents: {
     SubcribeButton,
+    SubmitButton,
   },
 });
