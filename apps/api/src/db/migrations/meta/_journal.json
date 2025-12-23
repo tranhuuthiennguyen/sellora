@@ -15,6 +15,13 @@
       "when": 1765272687997,
       "tag": "0001_add-user-timezone",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1766329204139,
+      "tag": "0002_loud_sharon_ventura",
+      "breakpoints": true
     }
   ]
 }

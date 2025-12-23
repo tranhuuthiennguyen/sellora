@@ -8,7 +8,7 @@ import {
   GetUserByIdResponseSchema,
   UpdateUserInputSchema,
   UpdateUserResponseSchema,
-} from "@sellora/shared/user";
+} from "@sellora/shared";
 
 export const GetUserByIdSchema: FastifySchema = {
   params: {

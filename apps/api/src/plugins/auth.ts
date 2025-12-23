@@ -2,8 +2,8 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import fp from "fastify-plugin";
 import { handleServerError } from "@helpers/errors.helper";
 import { getUserById } from "@modules/users/users.service";
-import { UserEntity } from "@sellora/shared/user";
-import { ERRORS } from "@sellora/shared/lib";
+import { UserEntity } from "@sellora/shared";
+import { ERRORS } from "@sellora/shared";
 
 declare module "fastify" {
   interface FastifyInstance {

@@ -1,16 +1,35 @@
-FROM node:24-alpine3.21
+# Builder
+FROM node:20-alpine AS builder
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-COPY package.json ./ 
-COPY package-lock.json ./
-
+COPY package.json package-lock.json ./
 COPY apps/api/package.json ./apps/api/package.json
+COPY packages/shared/package.json ./packages/shared/package.json
 
 RUN npm install
 
 COPY . .
 
+RUN npm run build --workspace=packages/shared
+RUN rm -rf dist && npm run build --workspace=apps/api
+
+# Runner
+# FROM node:20-alpine AS runner
+
+# WORKDIR /usr/src/app
+
+# ENV NODE_ENV=production
+
+# COPY --from=builder apps/api/dist ./app/apps/api/dist
+# COPY --from=builder node_modules ./node_modules
+# COPY --from=builder apps/api/package.json ./apps/api/package.json
+
 EXPOSE 5000
 
-CMD [ "npm", "run", "dev" ]
+WORKDIR /app/apps/api
+# Copy entrypoint
+COPY apps/api/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]

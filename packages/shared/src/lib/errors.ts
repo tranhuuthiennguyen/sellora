@@ -14,4 +14,4 @@ export const ERRORS = {
   userCredError: new AppError("Invalid credential", 401),
   unauthorizedAccess: new AppError("Unauthorized", 401),
   internalServerError: new AppError("Internal Server Error", 500),
-};
+} as const;
