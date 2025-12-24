@@ -9,7 +9,8 @@ COPY packages/shared/package.json ./packages/shared/package.json
 
 RUN npm install
 
-COPY . .
+COPY apps/api ./apps/api
+COPY packages ./packages
 
 RUN npm run build --workspace=packages/shared
 RUN rm -rf dist && npm run build --workspace=apps/api

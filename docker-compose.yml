@@ -8,6 +8,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
+    container_name: postgres
     volumes:
       - pg_data:/var/lib/postgresql/data/pg18
     networks:
@@ -23,6 +24,7 @@ services:
     restart: always
     ports:
       - 8080:8080
+    container_name: adminer
     networks:
       - backend
     environment:
@@ -32,10 +34,10 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
-
     restart: always
     env_file:
       - ./apps/api/.env.development
+    container_name: api
     develop:
       watch:
         - action: sync
@@ -45,10 +47,6 @@ services:
             - ./node_modules/
         - action: rebuild
           path: ./apps/api/package.json
-    # volumes:
-    #   - ./apps/api/src/:/app/apps/api/src
-    #   - ./packages/shared/src/:/app/packages/shared/src
-    #   - ./apps/api/nodemon.json:/app/apps/api/nodemon.json
     depends_on:
       postgres:
         condition: service_healthy
@@ -57,35 +55,41 @@ services:
     ports:
       - 5000:5000
   
-  # web:
-  #   build:
-  #     context: .
-  #     dockerfile: apps/web/Dockerfile
-  #   restart: always
-  #   env_file:
-  #     - .env
-  #   volumes:
-  #     - ./apps/web:/app/apps/web
-  #     - ./packages:/app/packages
-  #   depends_on:
-  #     - api
-  #   networks:
-  #     - backend
-  #   ports:
-  #     - 3000:3000
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    restart: always
+    container_name: web
+    develop:
+      watch:
+        - action: sync
+          path: ./apps/web/src
+          target: /app/apps/web/src
+          ignore:
+            - ./node_modules/
+        - action: rebuild
+          path: ./apps/web/package.json
+    depends_on:
+      - api
+    networks:
+      - backend
+    ports:
+      - 3000:3000
 
-  # nginx:
-  #   image: nginx:alpine
-  #   restart: always
-  #   ports:
-  #     - "8000:80"
-  #   volumes:
-  #     - ./nginx/default.conf:/etc/nginx/default.conf:ro
-  #   depends_on:
-  #     - api
-  #     - web
-  #   networks:
-  #     - backend
+  nginx:
+    image: nginx:alpine
+    restart: always
+    ports:
+      - 80:80
+    container_name: nginx
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/default.conf:ro
+    depends_on:
+      - api
+      - web
+    networks:
+      - backend
 
 networks:
   backend:
