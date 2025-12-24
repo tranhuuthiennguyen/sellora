@@ -30,18 +30,18 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 
-// export const products = pgTable("products", {
-//   id: serial("id").primaryKey(),
-//   sellerId: integer("id").notNull().references(() => users.id, { onDelete: 'cascade'}),
-//   title: varchar("title").notNull(),
-//   description: varchar("description"),
-//   priceCents: integer("price_cents").notNull().default(0),
-//   published: boolean("published").notNull().default(false),
-//   createdAt: timestamp("created_at", { withTimezone: true })
-//     .notNull(),
-//   updatedAt: timestamp("updated_at", { withTimezone: true })
-//     .notNull()
-// })
+export const products = pgTable("products", {
+  id: serial("id").primaryKey(),
+  sellerId: integer("id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  title: varchar("title").notNull(),
+  description: varchar("description"),
+  priceCents: integer("price_cents").notNull().default(0),
+  published: boolean("published").notNull().default(false),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull(),
+});
 
 // export const productFiles = pgTable("product_files", {
 //   id: serial("id").primaryKey(),

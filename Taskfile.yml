@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: '3'
+
+tasks:
+  up:
+    cmds:
+      - docker compose up --build --watch -d
+    silent: true
+  down:
+    cmds:
+      - docker compose down -v
+    silent: true
+  up-prod:
+    cmds:
+      - docker compose -f docker-compose.prod.yml up --build
+    silent: true
+  down-prod:
+    cmds:
+      - docker compose -f docker-compose.prod.yml down -v
+    silent: true

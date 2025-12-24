@@ -26,7 +26,9 @@ const dbPlugin = fp(
           return client;
         })
         .catch((error) => {
-          logger.error(`Failed to connect to database ${String(error)}`);
+          logger.error(
+            `Failed to connect to database ${String(error.message)}`,
+          );
           throw new Error(`Failed to connect to database ${String(error)}`);
         });
 
@@ -39,7 +41,7 @@ const dbPlugin = fp(
         });
       });
     } catch (error: any) {
-      throw new Error(error.mesage);
+      throw new Error(error.message);
     }
   },
   {

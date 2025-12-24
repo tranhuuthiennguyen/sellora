@@ -1,16 +1,66 @@
-# Sellora (React + Fastify + Postgres)
+# Sellora
 
-Sellora is an alternative to Gumroad built with React and Fastify
+Sellora is an E-Commerce platform selling digital products inspired by GumRoad built with React and Fastify
 
-## Todo
+## Installation
+
+1. Install Taskfile:
+
+   ```
+   npm install -g @go-task/cli
+   ```
+
+   Install Taskfile using other methods: [Taskfile Installation](https://taskfile.dev/docs/installation)
+2. Install & Setup Docker
+3. Docker Instruction:
+
+   * Start project in dev mode with files hot reload:
+
+   ```
+   task up
+   ```
+
+   * Start project in prod mode:
+
+   ```
+   task up-prod
+   ```
+
+## Backlog
 
 ### Configuration
-[-] Setup project environment (turborepo with husky + typescript server)
-[x] Setup database (drizzle)
-[x] Setup Docker
+
+* [X] Setup project environment (turborepo with husky + typescript server)
+* [X] Setup database (drizzle)
+* [X] Setup Docker + Nginx environment
 
 ### API
-[x] Authentication (JWT)
-[x] Routes Setup
-[x] Controllers
-[x] Middleware
+
+* [X] Authentication (JWT)
+* [ ] OAuth2
+* [X] Routes
+* [X] Controllers
+* [X] Models & Services
+* [X] Central error handler
+* [X] Schema validation * serialization (Typebox)
+* [X] CORS
+* [ ] Rate Limiter
+* [ ] Helmet
+* [ ] Event polling
+* [ ] Pagination
+
+### WEB
+
+* [X] Register/Login/Logout
+* [X] User Profile Management
+  * [X] Local: time zone, currency
+  * [X] Password
+  * [X] Personal details
+* [ ] Products Management
+  * [ ] User create products
+  * [ ] User modify products
+  * [ ] User delete products
+* [ ] Products Search
+* [ ] Orders
+* [ ] Payments
+* [ ] Analytics

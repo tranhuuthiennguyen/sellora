@@ -7,6 +7,11 @@ import { fileURLToPath, URL } from 'node:url'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  server: {
+    host: true,
+    port: 3000,
+    strictPort: true
+  },
   plugins: [
     tanstackRouter({
       target: 'react',
@@ -20,4 +25,7 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  optimizeDeps: {
+    include: ["@sellora/shared"]
+  }
 })

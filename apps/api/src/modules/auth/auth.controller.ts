@@ -19,9 +19,9 @@ import {
   updatePassword,
   verifyPassword,
 } from "@modules/auth/auth.service";
-import { CreateUserDto, UserEntity } from "@sellora/shared/user";
-import { ERRORS } from "@sellora/shared/lib";
-import { ChangePasswordDto, LoginInputDto } from "@sellora/shared/auth";
+import { CreateUserDto, UserEntity } from "@sellora/shared";
+import { ERRORS } from "@sellora/shared";
+import { ChangePasswordDto, LoginInputDto } from "@sellora/shared";
 import { EnvSchema } from "@/utils/validateEnv";
 import { HASH_SALT, STANDARD } from "@/constants";
 

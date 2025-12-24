@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && npm run copy:keys",
     "start": "node dist/server.js",
-    "dev": "nodemon",
+    "dev": "nodemon src/server.ts",
     "generate": "npx drizzle-kit generate --config=src/db/drizzle.config.ts",
     "migrate": "npx drizzle-kit migrate --config=src/db/drizzle.config.ts",
     "push": "npx drizzle-kit push --config=src/db/drizzle.config.ts",

@@ -15,8 +15,8 @@ import {
   GetUserByIdSchema,
   UpdateUserSchema,
 } from "@modules/users/users.schema";
-import { UserEntity } from "@sellora/shared/user";
-import { ERRORS } from "@sellora/shared/lib";
+import { UserEntity } from "@sellora/shared";
+import { ERRORS } from "@sellora/shared";
 
 export const getAllUsersHandler = async (
   request: FastifyRequest,

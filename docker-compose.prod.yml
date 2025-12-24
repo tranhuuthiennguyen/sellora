@@ -1,0 +1,90 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:18
+    restart: "always"
+    ports:
+      - 5432:5432 # dev only
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - pg_data:/var/lib/postgresql/data/pg18
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - backend
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: always
+    env_file:
+      - ./apps/api/.env
+    volumes:
+      - ./apps/api:/app/apps/api
+      - ./packages:/app/packages
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - backend
+    ports:
+      - 5000:5000
+  
+  # web:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/web/Dockerfile
+  #   restart: always
+  #   env_file:
+  #     - .env
+  #   volumes:
+  #     - ./apps/web:/app/apps/web
+  #     - ./packages:/app/packages
+  #   depends_on:
+  #     - api
+  #   networks:
+  #     - backend
+  #   ports:
+  #     - 3000:3000
+
+  # nginx:
+  #   image: nginx:alpine
+  #   restart: always
+  #   ports:
+  #     - "8000:80"
+  #   volumes:
+  #     - ./nginx/default.conf:/etc/nginx/default.conf:ro
+  #   depends_on:
+  #     - api
+  #     - web
+  #   networks:
+  #     - backend
+
+networks:
+  backend:
+    driver: bridge
+  frontend:
+    driver: bridge
+  app_network:
+    # external: true
+
+volumes:
+  pg_data:

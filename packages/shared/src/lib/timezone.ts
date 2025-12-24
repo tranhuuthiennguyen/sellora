@@ -200,4 +200,4 @@ export const IANA_TIMEZONE_MAP: Record<string, string> = {
   "Nuku'alofa": "Pacific/Tongatapu",
   Samoa: "Pacific/Apia",
   "Tokelau Is.": "Pacific/Fakaofo",
-};
+} as const;
