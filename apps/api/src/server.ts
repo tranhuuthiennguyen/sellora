@@ -12,37 +12,37 @@ moduleAlias.addAliases({
   "@schemas": `${__dirname}/schemas`,
   "@utils": `${__dirname}/utils`,
   "@helpers": `${__dirname}/helpers`,
+  "@application": `${__dirname}/application`,
+  "@domain": `${__dirname}/domain`,
+  "@infrastructure": `${__dirname}/infrastructure`,
+  "@interface": `${__dirname}/interface`,
 });
 
-import { buildApp } from "@/app";
-import { EnvSchema } from "@utils/validateEnv";
+import App from "@/infrastructure/webserver/app";
+import { EmailSchema, PasswordSchema } from "@/core/domain/validation/schemas";
+import AuthRoute from "./interface/routes/auth.route";
 
 const startServer = async () => {
-  const app = await buildApp();
+  const app = new App({
+    plugins: [],
+    routes: [AuthRoute],
+    schemas: [EmailSchema, PasswordSchema],
+  });
 
-  const { API_HOST, API_PORT } = app.getEnvs<typeof EnvSchema>();
+  await app.config();
 
-  //start server
-  try {
-    await app.listen({
-      port: Number(API_PORT),
-      host: String(API_HOST),
-    });
-  } catch (err) {
-    app.log.error(err);
-    process.exit(1);
-  }
+  await app.listen();
 
   // Graceful shutdown
   const signals: NodeJS.Signals[] = ["SIGINT", "SIGTERM"];
   signals.forEach((signal) => {
     process.on(signal, async () => {
       try {
-        await app.close();
-        app.log.info(`Close application on ${signal}`);
+        await app.app.close();
+        app.app.log.info(`Close application on ${signal}`);
         process.exit(0);
       } catch (err: any) {
-        app.log.error(`Error closing application on ${signal}`, err);
+        app.app.log.error(`Error closing application on ${signal}`, err);
         process.exit(1);
       }
     });

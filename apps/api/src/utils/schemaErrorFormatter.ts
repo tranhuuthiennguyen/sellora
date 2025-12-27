@@ -1,4 +1,5 @@
 import { FastifySchemaValidationError } from "fastify";
+import logger from "./logger";
 
 export const schemaErrorFormatter = (
   errors: FastifySchemaValidationError[],

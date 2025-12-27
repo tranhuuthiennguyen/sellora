@@ -6,9 +6,9 @@
     "build": "tsc -p tsconfig.json && npm run copy:keys",
     "start": "node dist/server.js",
     "dev": "nodemon src/server.ts",
-    "generate": "npx drizzle-kit generate --config=src/db/drizzle.config.ts",
-    "migrate": "npx drizzle-kit migrate --config=src/db/drizzle.config.ts",
-    "push": "npx drizzle-kit push --config=src/db/drizzle.config.ts",
+    "generate": "npx drizzle-kit generate --config=src/infrastructure/database/drizzle.config.ts",
+    "migrate": "npx drizzle-kit migrate --config=src/infrastructure/database/drizzle.config.ts",
+    "push": "npx drizzle-kit push --config=src/infrastructure/database/drizzle.config.ts",
     "seed": "tsx ./src/db/seed/index.ts",
     "test": "vitest",
     "test:watch": "vitest --watch",
@@ -19,6 +19,7 @@
   "license": "ISC",
   "dependencies": {
     "@fastify/autoload": "^6.3.1",
+    "@fastify/awilix": "^8.2.0",
     "@fastify/cookie": "^11.0.2",
     "@fastify/cors": "^11.1.0",
     "@fastify/env": "^5.0.3",
@@ -31,6 +32,7 @@
     "ajv": "^8.17.1",
     "ajv-errors": "^3.0.0",
     "ajv-formats": "^3.0.1",
+    "awilix": "^12.0.5",
     "bcrypt": "^6.0.0",
     "dotenv": "^16.0.3",
     "drizzle-orm": "^0.44.6",
@@ -75,6 +77,10 @@
     "@modules": "dist/modules",
     "@plugins": "dist/plugins",
     "@schemas": "dist/schemas",
-    "@utils": "dist/utils"
+    "@utils": "dist/utils",
+    "@application": "dist/application",
+    "@domain": "dist/domain",
+    "@infrastructure": "dist/infrastructure",
+    "@interface": "dist/interface"
   }
 }

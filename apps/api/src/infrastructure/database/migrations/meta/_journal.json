@@ -1,0 +1,104 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1763119837194,
+      "tag": "0000_ini",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1765272687997,
+      "tag": "0001_add-user-timezone",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1766613681685,
+      "tag": "0002_create-products-table",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1766613779035,
+      "tag": "0003_create-product-files-table",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1766613815702,
+      "tag": "0004_create-seller-profile-sections-table",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1766613842415,
+      "tag": "0005_create-seller-profiles-table",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1766613859209,
+      "tag": "0006_create-tags-table",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1766616260232,
+      "tag": "0007_create-product-taggings-table",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1766616289844,
+      "tag": "0008_create-categories-table",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1766616307112,
+      "tag": "0009_create-product-categories-table",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1766616319945,
+      "tag": "0010_create-carts-table",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1766616341753,
+      "tag": "0011_create-cart-products",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1766616353818,
+      "tag": "0012_create-orders-table",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1766616409324,
+      "tag": "0013_create-purchases-table",
+      "breakpoints": true
+    }
+  ]
+}

@@ -1,10 +1,10 @@
-import pino from "pino";
+import pino, { Logger } from "pino";
 import * as dotenv from "dotenv";
-import { envPath } from "@config";
+import { envPath } from "@/infrastructure/config";
 
 dotenv.config({ path: envPath });
 
-export const logger = pino({
+const logger: Logger = pino({
   transport: {
     target: "pino-pretty",
     options: {
@@ -28,3 +28,5 @@ export const logger = pino({
   //   }
   // }
 });
+
+export default logger;

@@ -47,6 +47,13 @@ services:
             - ./node_modules/
         - action: rebuild
           path: ./apps/api/package.json
+        - action: sync
+          path: ./packages/shared/src
+          target: /app/packages/shared/src
+          ignore:
+            - ./node_modules/
+        - action: rebuild
+          path: ./packages/shared/package.json
     depends_on:
       postgres:
         condition: service_healthy
@@ -70,6 +77,13 @@ services:
             - ./node_modules/
         - action: rebuild
           path: ./apps/web/package.json
+        - action: sync
+          path: ./packages/shared/src
+          target: /app/packages/shared/src
+          ignore:
+            - ./node_modules/
+        - action: rebuild
+          path: ./packages/shared/package.json
     depends_on:
       - api
     networks:

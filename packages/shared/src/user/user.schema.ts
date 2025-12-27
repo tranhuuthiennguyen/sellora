@@ -11,11 +11,7 @@ export const UserSchema = Type.Object({
   username: Type.String({
     minLength: 1,
   }),
-  displayName: Type.Optional(
-    Type.String({
-      minLength: 1,
-    }),
-  ),
+  displayName: Type.Optional(Type.String()),
   bio: Type.Optional(
     Type.String({
       maxLength: 500,
