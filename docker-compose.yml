@@ -30,80 +30,80 @@ services:
     environment:
       ADMINER_DEFAULT_SERVER: postgres
 
-  api:
-    build:
-      context: .
-      dockerfile: apps/api/Dockerfile
-    restart: always
-    env_file:
-      - ./apps/api/.env.development
-    container_name: api
-    develop:
-      watch:
-        - action: sync
-          path: ./apps/api/src
-          target: /app/apps/api/src
-          ignore:
-            - ./node_modules/
-        - action: rebuild
-          path: ./apps/api/package.json
-        - action: sync
-          path: ./packages/shared/src
-          target: /app/packages/shared/src
-          ignore:
-            - ./node_modules/
-        - action: rebuild
-          path: ./packages/shared/package.json
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - backend
-    ports:
-      - 5000:5000
+  # api:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/api/Dockerfile
+  #   restart: always
+  #   env_file:
+  #     - ./apps/api/.env.development
+  #   container_name: api
+  #   develop:
+  #     watch:
+  #       - action: sync
+  #         path: ./apps/api/src
+  #         target: /app/apps/api/src
+  #         ignore:
+  #           - ./node_modules/
+  #       - action: rebuild
+  #         path: ./apps/api/package.json
+  #       - action: sync
+  #         path: ./packages/shared/src
+  #         target: /app/packages/shared/src
+  #         ignore:
+  #           - ./node_modules/
+  #       - action: rebuild
+  #         path: ./packages/shared/package.json
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   networks:
+  #     - backend
+  #   ports:
+  #     - 5000:5000
   
-  web:
-    build:
-      context: .
-      dockerfile: apps/web/Dockerfile
-    restart: always
-    container_name: web
-    develop:
-      watch:
-        - action: sync
-          path: ./apps/web/src
-          target: /app/apps/web/src
-          ignore:
-            - ./node_modules/
-        - action: rebuild
-          path: ./apps/web/package.json
-        - action: sync
-          path: ./packages/shared/src
-          target: /app/packages/shared/src
-          ignore:
-            - ./node_modules/
-        - action: rebuild
-          path: ./packages/shared/package.json
-    depends_on:
-      - api
-    networks:
-      - backend
-    ports:
-      - 3000:3000
+  # web:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/web/Dockerfile
+  #   restart: always
+  #   container_name: web
+  #   develop:
+  #     watch:
+  #       - action: sync
+  #         path: ./apps/web/src
+  #         target: /app/apps/web/src
+  #         ignore:
+  #           - ./node_modules/
+  #       - action: rebuild
+  #         path: ./apps/web/package.json
+  #       - action: sync
+  #         path: ./packages/shared/src
+  #         target: /app/packages/shared/src
+  #         ignore:
+  #           - ./node_modules/
+  #       - action: rebuild
+  #         path: ./packages/shared/package.json
+  #   depends_on:
+  #     - api
+  #   networks:
+  #     - backend
+  #   ports:
+  #     - 3000:3000
 
-  nginx:
-    image: nginx:alpine
-    restart: always
-    ports:
-      - 80:80
-    container_name: nginx
-    volumes:
-      - ./nginx/default.conf:/etc/nginx/default.conf:ro
-    depends_on:
-      - api
-      - web
-    networks:
-      - backend
+  # nginx:
+  #   image: nginx:alpine
+  #   restart: always
+  #   ports:
+  #     - 80:80
+  #   container_name: nginx
+  #   volumes:
+  #     - ./nginx/default.conf:/etc/nginx/default.conf:ro
+  #   depends_on:
+  #     - api
+  #     - web
+  #   networks:
+  #     - backend
 
 networks:
   backend:

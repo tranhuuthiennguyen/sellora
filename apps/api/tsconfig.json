@@ -1,25 +1,19 @@
 {
-  "extends": "@sellora/typescript-config/fastify.json",
+  "extends": "@tsconfig/node24/tsconfig.json",
   "compilerOptions": {
+    "resolveJsonModule": true,
+    /* Linting */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": false,
+    "noStrictGenericChecks": false,
     "outDir": "dist",
     "paths": {
       "@/*": ["./src/*"],
-      "@certs/*": ["./src/certs/*"],
-      "@config": ["./src/config"],
-      "@contants": ["./src/constants"],
-      "@db/*": ["./src/db/*"],
-      "@modules/*": ["./src/modules/*"],
-      "@plugins/*": ["./src/plugins/*"],
-      "@schemas/*": ["./src/schemas/*"],
-      "@utils/*": ["./src/utils/*"],
-      "@helpers/*": ["./src/helpers/*"],
-      "@application/*": ["./src/application/*"],
-      "@core/*": ["./src/core/*"],
-      "@infrastructure/*": ["./src/infrastructure/*"],
-      "@interface/*": ["./src/interface/*"],
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.json", ".env", "src/**/*.feature", "src/**/*.d.ts", "src/**/*.key"],
+  "include": ["src"],
   "exclude": [
     "node_modules",
     "dist"
