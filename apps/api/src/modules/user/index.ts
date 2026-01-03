@@ -1,13 +1,11 @@
-import { UserEntity } from "./domain/user.entity";
-import UserRepository from "./database/user.repository";
 import { ActionCreatorFactory } from "@/core/cqrs/action-creator";
 import UserMapper from "./user.mapper";
+import { UserRepositoryPort } from "./database/user.repository.port";
 
 declare global {
   export interface Dependencies {
     userMapper: UserMapper;
-    userRepository: UserRepository;
-    userEntity: typeof UserEntity;
+    userRepository: UserRepositoryPort;
   }
 }
 

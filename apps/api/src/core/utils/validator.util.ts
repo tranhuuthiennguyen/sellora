@@ -1,7 +1,16 @@
 import Ajv from "ajv";
+import AjvErrors from "ajv-errors";
 import addFormats from "ajv-formats";
 
-export const ajv = addFormats(new Ajv({}), [
+const ajvInstance = new Ajv({
+  allErrors: true,
+  strict: false,
+  coerceTypes: true,
+});
+
+AjvErrors(ajvInstance);
+
+export const ajv = addFormats(ajvInstance, [
   "date-time",
   "time",
   "date",

@@ -1,79 +1,41 @@
 import SqlRepositoryBase from "@/core/db/sql-repository.base";
 import { UserEntity } from "../domain/user.entity";
 import { UserRepositoryPort } from "./user.repository.port";
-import { FromSchema } from "json-schema-to-ts";
+import Type, { Static } from "typebox";
 
-export const UserSchema = {
-  type: "object",
-  additionalProperties: false,
-  properties: {
-    id: {
-      type: "string",
-      maxLength: 255,
-    },
-    email: {
-      type: "string",
-      format: "email",
-      maxLength: 255,
-      description: "Must be unique.",
-    },
-    passwordHash: {
-      type: "string",
-      maxLength: 255,
-    },
-    username: {
-      type: "string",
-      maxLength: 50,
-      description: "Must be unique.",
-    },
-    displayName: {
-      type: "string",
-    },
-    bio: {
-      type: "string",
-      maxLength: 255,
-    },
-    currencyType: {
-      type: "string",
-      maxLength: 10,
-      default: "USD",
-    },
-    profilePictureUrl: {
-      type: "string",
-    },
-    country: {
-      type: "string",
-      maxLength: 50,
-    },
-    state: {
-      type: "string",
-      maxLength: 50,
-    },
-    city: {
-      type: "string",
-      maxLength: 50,
-    },
-    zipCode: {
-      type: "string",
-      maxLength: 20,
-    },
-    streetAddress: {
-      type: "string",
-      maxLength: 100,
-    },
-    createdAt: {
-      type: "string",
-      format: "date-time",
-    },
-    updatedAt: {
-      type: "string",
-      format: "date-time",
-    },
-  },
-  required: ["id", "email", "passwordHash", "username", "currencyType"],
-} as const;
+export const userSchema = Type.Object({
+  id: Type.String(),
+  email: Type.String({
+    format: "email",
+    description: "must be in email format",
+  }),
+  passwordHash: Type.String(),
+  username: Type.String({
+    minLength: 1,
+  }),
+  displayName: Type.Optional(
+    Type.String({
+      minLength: 1,
+    }),
+  ),
+  bio: Type.Optional(
+    Type.String({
+      maxLength: 500,
+    }),
+  ),
+  currencyType: Type.String(),
+  profilePictureUrl: Type.Optional(Type.String()),
+  country: Type.Optional(Type.String()),
+  state: Type.Optional(Type.String()),
+  city: Type.Optional(Type.String()),
+  zipCode: Type.Optional(Type.String()),
+  streetAddress: Type.Optional(Type.String()),
+  timeZone: Type.String(),
+  createdAt: Type.String({ format: "date-time" }),
+  updatedAt: Type.String({ format: "date-time" }),
+});
 
-export type UserModel = FromSchema<typeof UserSchema>;
+export type UserModel = Static<typeof userSchema>;
 
 class UserRepository
   extends SqlRepositoryBase<UserEntity, UserModel>

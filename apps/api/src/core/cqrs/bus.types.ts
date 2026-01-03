@@ -14,14 +14,14 @@ export interface CommandCreator<Payload> {
 export type CommandHandler = (command: Action<any>) => Promise<any>;
 export type EventHandler = (event: Action<any>) => void;
 
-export interface CommandBus {
+export interface ICommandBus {
   register(type: string, handler: CommandHandler): void;
   unregister(type: string): void;
   execute<R>(command: Action<any>): Promise<R>;
   addMiddleware(fn: Middleware): void;
 }
 
-export interface EventBus {
+export interface IEventBus {
   on(type: string, handler: EventHandler): void;
   emit(event: Action<any>): void;
   addMiddleware(fn: Middleware): void;

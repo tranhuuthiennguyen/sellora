@@ -13,6 +13,7 @@ CREATE TABLE "users" (
 	"city" varchar(50),
 	"zip_code" varchar(20),
 	"street_address" varchar(100),
+	"time_zone" varchar(255) DEFAULT 'Pacific Time (US & Canada)' NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now(),
 	"updated_at" timestamp with time zone DEFAULT now(),
 	CONSTRAINT "users_email_unique" UNIQUE("email"),

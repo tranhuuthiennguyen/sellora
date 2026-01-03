@@ -6,6 +6,7 @@ enum ExceptionError {
   NOT_FOUND = "Not Found",
   INTERNAL_SERVER_ERROR = "Internal Server Error",
   DATABASE_ERROR = "Database Error",
+  INVALID_CREDENTIALS = "Invalid Credentials",
 }
 
 /**
@@ -44,6 +45,11 @@ export class NotFoundException extends ExceptionBase {
   constructor(message: string = NotFoundException.mesasge) {
     super(message);
   }
+}
+
+export class InvalidCredentialsError extends ExceptionBase {
+  readonly statusCode = 401;
+  readonly error = ExceptionError.INVALID_CREDENTIALS;
 }
 
 /**

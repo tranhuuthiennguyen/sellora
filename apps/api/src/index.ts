@@ -4,6 +4,8 @@ import { closeDbConnection } from "@/core/db/postgres";
 import GracefulServer from "@gquittet/graceful-server";
 import Fastify from "fastify";
 import { randomUUID } from "node:crypto";
+import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
+import { ajv } from "./core/utils/validator.util";
 
 async function init() {
   const fastify = Fastify({
@@ -18,14 +20,9 @@ async function init() {
     routerOptions: {
       ignoreDuplicateSlashes: true,
     },
-    ajv: {
-      customOptions: {
-        allErrors: true,
-        coerceTypes: true,
-        keywords: ["example"],
-      },
-    },
-  });
+  })
+    .withTypeProvider<TypeBoxTypeProvider>()
+    .setValidatorCompiler(({ schema }) => ajv.compile(schema));
 
   const server = new Server(fastify);
 

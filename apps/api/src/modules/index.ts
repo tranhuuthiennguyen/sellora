@@ -1,4 +1,4 @@
-import { CommandBus, EventBus } from "@/core/cqrs/bus.types";
+import { ICommandBus, IEventBus } from "@/core/cqrs/bus.types";
 import PostgresDB from "@/core/db/postgres";
 import { asValue } from "awilix";
 import { FastifyBaseLogger } from "fastify";
@@ -8,9 +8,9 @@ declare global {
   export interface Dependencies {
     logger: FastifyBaseLogger;
     db: ReturnType<typeof postgres>;
-    queryBus: CommandBus;
-    commandBus: CommandBus;
-    eventBus: EventBus;
+    queryBus: ICommandBus;
+    commandBus: ICommandBus;
+    eventBus: IEventBus;
   }
 }
 
@@ -18,21 +18,20 @@ declare global {
 
 export function makeDependencies({
   logger,
-  // queryBus,
-  // commandBus,
-  // eventBus
+  queryBus,
+  commandBus,
+  eventBus,
 }: {
   logger: FastifyBaseLogger;
-  // queryBus: CommandBus
-  // commandBus: CommandBus
-  // eventBus: EventBus
+  queryBus: ICommandBus;
+  commandBus: ICommandBus;
+  eventBus: IEventBus;
 }) {
   return {
     logger: asValue(logger),
     db: asValue(PostgresDB),
-    // repositoryBase: SqlRepositoryBase,
-    // queryBus: asValue(queryBus),
-    // commandBus: asValue(commandBus),
-    // eventBus: asValue(eventBus)
+    queryBus: asValue(queryBus),
+    commandBus: asValue(commandBus),
+    eventBus: asValue(eventBus),
   };
 }

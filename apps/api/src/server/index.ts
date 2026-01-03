@@ -3,7 +3,6 @@ import { FastifyInstance } from "fastify";
 import AutoLoad from "@fastify/autoload";
 import UnderPressure from "@fastify/under-pressure";
 import env from "../config/env";
-import { JsonSchemaToTsProvider } from "@fastify/type-provider-json-schema-to-ts";
 import { di } from "./di";
 
 export class Server {
@@ -46,6 +45,6 @@ export class Server {
     await this.registerModules();
     await this.registerHealth();
 
-    return this.fastify.withTypeProvider<JsonSchemaToTsProvider>();
+    return this.fastify;
   }
 }

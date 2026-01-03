@@ -10,9 +10,9 @@ export async function di(fastify: FastifyInstance) {
     .register({
       ...makeDependencies({
         logger: fastify.log,
-        // queryBus: fastify.queryBus,
-        // commandBus: fastify.commandBus,
-        // eventBus: fastify.eventBus
+        queryBus: fastify.queryBus,
+        commandBus: fastify.commandBus,
+        eventBus: fastify.eventBus,
       }),
     })
     .loadModules(
@@ -25,6 +25,22 @@ export async function di(fastify: FastifyInstance) {
       {
         formatName,
         resolverOptions: {
+          register: asClass,
+          lifetime: Lifetime.SINGLETON,
+        },
+      },
+    )
+    .loadModules(
+      [
+        path.join(
+          __dirname,
+          "../../modules/**/*.{handler,event-handler}.{js,ts}",
+        ),
+      ],
+      {
+        formatName,
+        resolverOptions: {
+          asyncInit: "init",
           register: asClass,
           lifetime: Lifetime.SINGLETON,
         },

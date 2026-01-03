@@ -18,9 +18,9 @@ INSERT INTO users (
 )
 VALUES
 (
-  '11111111-1111-1111-1111-111111111111',
+  '0bb35df6-c89c-4520-a7f0-0bd727a49c57',
   'admin@example.com',
-  '$2b$10$abcdefghijklmnopqrstuvAdminHash',
+  '$2a$10$8vkiYN0js.odlUu52TI7zey2NFKlEmShoiuUkfF1xTixM6RQIHsNm',
   'admin_user',
   'Admin User',
   'System administrator account',
