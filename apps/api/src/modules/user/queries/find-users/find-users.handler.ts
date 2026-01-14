@@ -26,7 +26,7 @@ class FindUsersQuery {
     this.userMapper = userMapper;
   }
 
-  async handle({
+  async handler({
     payload,
   }: ReturnType<typeof findUsersQuery>): FindUsersQueryResult {
     const query = paginatedQueryBase(payload);
@@ -54,7 +54,7 @@ class FindUsersQuery {
   }
 
   init() {
-    this.queryBus.register(findUsersQuery.type, this.handle.bind(this));
+    this.queryBus.register(findUsersQuery.type, this.handler.bind(this));
   }
 }
 

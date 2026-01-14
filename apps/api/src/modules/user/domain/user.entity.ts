@@ -1,9 +1,7 @@
-import { UserModel } from "../database/user.repository";
+import BaseEntity from "@/core/ddd/entity.base";
+import { CreateUserProps, PersistedUserProps } from "./user.types";
 
-export type UserProps = UserModel;
-
-export class UserEntity {
-  private readonly _id: string;
+export class UserEntity extends BaseEntity {
   private _email: string;
   private _passwordHash: string;
   private _username: string;
@@ -19,17 +17,15 @@ export class UserEntity {
   private _streetAddress: string | null;
   private _timeZone: string;
 
-  private _createdAt: string;
-  private _updatedAt: string;
+  private _tokenVersion: number;
 
-  constructor(props: UserProps) {
-    // Required validations (domain invariants)
-    if (!props.id) throw new Error("User must have an id");
-    if (!props.email) throw new Error("User must have an email");
-    if (!props.username) throw new Error("User must have a username");
-    if (!props.currencyType) throw new Error("User must have a currencyType");
+  private constructor(props: PersistedUserProps) {
+    super({
+      id: props.id,
+      createdAt: props.createdAt,
+      updatedAt: props.updatedAt,
+    });
 
-    this._id = props.id;
     this._email = props.email;
     this._passwordHash = props.passwordHash;
     this._username = props.username;
@@ -45,14 +41,47 @@ export class UserEntity {
     this._streetAddress = props.streetAddress ?? null;
     this._timeZone = props.timeZone;
 
-    this._createdAt = props.createdAt ?? new Date().toString();
-    this._updatedAt = props.updatedAt ?? new Date().toString();
+    this._tokenVersion = props.tokenVersion;
+  }
+
+  // ================= FACTORIES =================
+
+  static createNew(props: CreateUserProps): UserEntity {
+    if (!props.email) throw new Error("User must have an email");
+    if (!props.username) throw new Error("User must have a username");
+    if (!props.passwordHash) throw new Error("User must have a passwordHash");
+
+    const now = new Date().toISOString();
+
+    return new UserEntity({
+      id: crypto.randomUUID(), // or inject externally if preferred
+      email: props.email,
+      passwordHash: props.passwordHash,
+      username: props.username,
+      currencyType: "USD",
+
+      displayName: null,
+      bio: null,
+      profilePictureUrl: null,
+      country: null,
+      state: null,
+      city: null,
+      zipCode: null,
+      streetAddress: null,
+      timeZone: "Pacific Time (US & Canada)",
+
+      tokenVersion: 1,
+
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
+
+  static fromPersistence(props: PersistedUserProps): UserEntity {
+    return new UserEntity(props);
   }
 
   // ========== GETTERS ==========
-  get id() {
-    return this._id;
-  }
   get email() {
     return this._email;
   }
@@ -95,10 +124,7 @@ export class UserEntity {
     return this._timeZone;
   }
 
-  get createdAt() {
-    return this._createdAt;
-  }
-  get updatedAt() {
-    return this._updatedAt;
+  get tokenVersion() {
+    return this._tokenVersion;
   }
 }

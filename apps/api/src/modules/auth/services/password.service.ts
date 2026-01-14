@@ -1,12 +1,33 @@
+import { UserRepositoryPort } from "@/modules/user/database/user.repository.port";
 import * as bcrypt from "bcrypt";
 
 export interface PasswordServicePort {
-  hash(saltRounds: number, value: string): Promise<string>;
+  hash(value: string, saltRounds?: number): Promise<string>;
   compare(raw: string, hashed: string): Promise<boolean>;
+  update(email: string, newPassword: string): Promise<any>;
 }
 
 class BcryptPasswordService implements PasswordServicePort {
-  hash(saltRounds = 10, value: string): Promise<string> {
+  private readonly db: Dependencies["db"];
+
+  constructor({ db }) {
+    this.db = db;
+  }
+
+  async update(email: string, newPassword: string): Promise<any> {
+    const newPasswordHashed = await this.hash(newPassword);
+
+    const result = await this.db`
+      UPDATE users
+      SET password_hash = ${newPasswordHashed}
+      WHERE email = ${email}
+      RETURNING email
+    `;
+
+    return result;
+  }
+
+  hash(value: string, saltRounds = 10): Promise<string> {
     return new Promise((resolve, reject) => {
       bcrypt.genSalt(saltRounds, (err, salt) => {
         if (err) return reject(err);

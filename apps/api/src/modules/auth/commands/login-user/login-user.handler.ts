@@ -1,14 +1,16 @@
 import { UserRepositoryPort } from "@/modules/user/database/user.repository.port";
 import { authActionCreator } from "../..";
 import { LoginUserRequestDto } from "./login-user.schema";
-import { ICommandBus, IEventBus } from "@/core/cqrs/bus.types";
+import { ICommandBus } from "@/core/cqrs/bus.types";
 import { InvalidCredentialsError, NotFoundException } from "@/core/exceptions";
-import { PasswordServicePort } from "../../infrastructure/password.service";
-import { TokenServicePort } from "../../infrastructure/jwt.token.service";
+import { PasswordServicePort } from "../../services/password.service";
+import { TokenServicePort } from "../../services/jwt.token.service";
 import { UserEntity } from "@/modules/user/domain/user.entity";
+import { UserNotFoundError } from "@/modules/user/domain/user.error";
 
 export type LoginUserCommandResult = Promise<{
   accessToken: string;
+  refreshToken: string;
   user: UserEntity;
 }>;
 
@@ -22,20 +24,20 @@ class LoginUserHandler {
   private readonly passwordService: PasswordServicePort;
   private readonly jwtTokenService: TokenServicePort;
   private readonly commandBus: ICommandBus;
-  private readonly eventBus: IEventBus;
+  private readonly logger: any;
 
   constructor({
     userRepository,
     passwordService,
     jwtTokenService,
     commandBus,
-    eventBus,
+    logger,
   }) {
     this.userRepository = userRepository;
     this.passwordService = passwordService;
     this.jwtTokenService = jwtTokenService;
     this.commandBus = commandBus;
-    this.eventBus = eventBus;
+    this.logger = logger;
   }
 
   async handler({
@@ -44,7 +46,7 @@ class LoginUserHandler {
     const { email, password } = payload;
     const user = await this.userRepository.findOneByEmail(email);
     if (!user) {
-      throw new NotFoundException("User with this email doesn't exist");
+      throw new UserNotFoundError();
     }
     if (!user.passwordHash) {
       throw new InvalidCredentialsError(
@@ -59,10 +61,12 @@ class LoginUserHandler {
       throw new InvalidCredentialsError("Incorrect password");
     }
     const accessToken = await this.jwtTokenService.generateAccessToken(user);
-    // this.eventBus.emit(loginUserEvent(payload))
-
+    const refreshToken = await this.jwtTokenService.generateRefreshToken(user);
+    this.logger.info(`LoginUserHandler(): access token signed`);
+    this.logger.info(`LoginUserHandler(): refresh token signed`);
     return {
       accessToken,
+      refreshToken,
       user,
     };
   }

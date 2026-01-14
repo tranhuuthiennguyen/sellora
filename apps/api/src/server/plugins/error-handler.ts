@@ -13,12 +13,12 @@ const fastifyErrorCodesMap = {
       [validationError.instancePath.split("/")[1]]: validationError.message,
     })),
     statusCode: 400,
-    message: "Validation error",
-    error: "Bad Request",
+    message: "VALIDATION_ERROR",
+    error: "BAD_REQUEST",
   }),
   FST_ERR_NOT_FOUND: () => ({
-    message: "Not Found",
-    error: "Not Found",
+    message: "NOT_FOUND",
+    error: "NOT_FOUND",
     statusNode: 404,
   }),
 };
@@ -39,6 +39,7 @@ async function errorHandlerPlugin(fastify: FastifyInstance) {
     fastify.log.error(error);
     if (error instanceof ExceptionBase) {
       return res.status(error.statusCode).send({
+        status: "failed",
         statusCode: error.statusCode,
         message: error.message,
         error: error.error,
@@ -47,8 +48,9 @@ async function errorHandlerPlugin(fastify: FastifyInstance) {
     }
 
     return res.status(500).send({
+      status: "error",
       statusCode: 500,
-      message: "Internal Server Error",
+      message: "INTERNAL_SERVER_ERROR",
       error: "Internal Server Error",
       correlationId: getRequestId(),
     } satisfies ApiErrorResponse);

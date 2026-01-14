@@ -2,11 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAppForm } from "@/hooks/form";
 import SettingsNavBar from "@/components/settings/SettingsNavBar";
-import { usersApi } from "@/api/users";
-import type { UpdateUserDto } from "@sellora/shared";
+import { usersApi } from "@/api/user";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { meQuery } from "@/api/auth/queries";
+import type { updateUserRequestDto } from "@/api/user/user.dto";
 
 export const Route = createFileRoute("/_app/settings/")({
   component: RouteComponent,
@@ -14,13 +14,13 @@ export const Route = createFileRoute("/_app/settings/")({
 
 function RouteComponent() {
   const queryClient = useQueryClient();
-  const { data } = useQuery(meQuery());
+  const { accessToken } = useAuth();
+  const { data } = useQuery(meQuery(accessToken));
 
-  const { user } = useAuth();
-  if (!user) throw new Error("WHERE TF IS USER????");
+  const user = data.data.me;
 
   const mutation = useMutation({
-    mutationFn: async (payload: UpdateUserDto) => {
+    mutationFn: async (payload: updateUserRequestDto) => {
       return await usersApi.patch(user.id, payload);
     },
     onSuccess: () => {
@@ -31,8 +31,8 @@ function RouteComponent() {
 
   const form = useAppForm({
     defaultValues: {
-      timezone: data?.user.timezone ?? "",
-      currencyType: data?.user.currencyType ?? "",
+      timeZone: user.timeZone ?? "",
+      currencyType: user.currencyType ?? "",
     },
     onSubmit: ({ value }) => {
       mutation.mutate(value);
@@ -60,7 +60,7 @@ function RouteComponent() {
           </span>
           <span className="col-span-7">
             <form.AppField
-              name="timezone"
+              name="timeZone"
               children={(field) => <field.TimeZoneSettingField />}
             />
             <form.AppField

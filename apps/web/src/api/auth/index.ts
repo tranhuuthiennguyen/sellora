@@ -1,36 +1,43 @@
 import { api } from "@/api";
-import type { UserEntity } from "@sellora/shared";
 
 export const authApi = {
   refresh: async () => {
-    const res = await api.get("/auth/refresh");
-    return res.data as { accessToken: string };
+    const res = await api.get("/refresh-token");
+    return res.data;
   },
 
-  me: async (token?: string) => {
-    const res = await api.get("/auth/me", {
+  me: async (token?: string | null) => {
+    const res = await api.get("/me", {
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     });
 
-    return res.data as { user: UserEntity };
+    return res.data;
   },
 
   register: async (email: string, password: string) => {
-    const res = await api.post("/auth/register", { email, password });
+    const res = await api.post("/register", { email, password });
     return res.data;
   },
 
   login: async (email: string, password: string) => {
-    const res = await api.post("/auth/login", { email, password });
+    const res = await api.post("/login", { email, password });
     return res.data;
   },
 
   logout: async () => {
-    await api.post("/auth/logout");
+    await api.post("/logout");
   },
 
-  changePassword: async (oldPassword: string, newPassword: string) => {
-    const res = await api.patch("/auth/password", { oldPassword, newPassword });
+  changePassword: async (
+    email: string,
+    oldPassword: string,
+    newPassword: string,
+  ) => {
+    const res = await api.patch("/change-password", {
+      email,
+      oldPassword,
+      newPassword,
+    });
     return res.data;
   },
 };

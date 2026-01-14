@@ -1,12 +1,12 @@
 import { ExceptionBase } from "./exception-base";
 
 enum ExceptionError {
-  BAD_REQUEST = "Bad Request",
-  CONFLICT = "Conflict",
-  NOT_FOUND = "Not Found",
-  INTERNAL_SERVER_ERROR = "Internal Server Error",
-  DATABASE_ERROR = "Database Error",
-  INVALID_CREDENTIALS = "Invalid Credentials",
+  BAD_REQUEST = "BAD_REQUEST",
+  CONFLICT = "CONFLICT",
+  NOT_FOUND = "NOT_FOUND",
+  INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR",
+  DATABASE_ERROR = "DATABASE_ERROR",
+  INVALID_CREDENTIALS = "INVALID_CREDENTIALS",
 }
 
 /**

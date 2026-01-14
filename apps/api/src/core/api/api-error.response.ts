@@ -2,6 +2,7 @@ import { Type, Static } from "typebox";
 
 export const apiErrorResponseSchema = Type.Object(
   {
+    status: Type.String(),
     statusCode: Type.Integer(),
     message: Type.String(),
     error: Type.String(),

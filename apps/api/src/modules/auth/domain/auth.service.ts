@@ -1,6 +1,6 @@
 import { UserRepositoryPort } from "@/modules/user/database/user.repository.port";
-import { PasswordServicePort } from "../infrastructure/password.service";
-import { TokenServicePort } from "../infrastructure/jwt.token.service";
+import { PasswordServicePort } from "../services/password.service";
+import { TokenServicePort } from "../services/jwt.token.service";
 
 class AuthService {
   private readonly userRepository: UserRepositoryPort;

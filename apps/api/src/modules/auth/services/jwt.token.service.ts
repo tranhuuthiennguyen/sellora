@@ -18,13 +18,14 @@ class JwtTokenService implements TokenServicePort {
 
   async generateAccessToken(user: UserEntity): Promise<string> {
     return await accessTokenSigner({
-      sub: user.id,
+      sub: user.email,
     });
   }
 
   async generateRefreshToken(user: UserEntity): Promise<string> {
     return await refreshTokenSigner({
-      sub: user.id,
+      tokenVersion: user.tokenVersion,
+      sub: user.email,
     });
   }
 }

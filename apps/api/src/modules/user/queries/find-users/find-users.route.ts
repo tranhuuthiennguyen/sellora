@@ -15,6 +15,7 @@ export default async function findUser(fastify: FastifyInstance) {
         200: userPaginatedResponseSchema,
       },
     },
+    onRequest: fastify.authenticate,
     handler: async (req, res) => {
       const result = await fastify.queryBus.execute<FindUsersQueryResult>(
         findUsersQuery(req.query as any),
@@ -22,7 +23,7 @@ export default async function findUser(fastify: FastifyInstance) {
 
       const response = {
         ...result,
-        users: result.data?.map(
+        data: result.data?.map(
           fastify.diContainer.cradle.userMapper.toResponse,
         ),
       };

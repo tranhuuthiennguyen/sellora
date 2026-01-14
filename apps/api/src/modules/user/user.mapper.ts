@@ -6,9 +6,28 @@ import { ajv } from "@/core/utils/validator.util";
 import { ArgumentInvalidException } from "@/core/exceptions";
 
 class UserMapper implements Mapper<UserEntity, UserModel, UserResponseDto> {
-  toPersistence(user: UserEntity): UserModel {
+  toPersistence(entity: UserEntity): UserModel {
     const validator = ajv.compile(userSchema);
-    const record: UserModel = user.toObject() as UserModel;
+    const record: UserModel = {
+      id: entity.id,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+      email: entity.email,
+      passwordHash: entity.passwordHash,
+      username: entity.username,
+      currencyType: entity.currencyType,
+      displayName: entity.displayName as string | undefined,
+      bio: entity.bio as string | undefined,
+      profilePictureUrl: entity.profilePictureUrl as string | undefined,
+      country: entity.country as string | undefined,
+      state: entity.state as string | undefined,
+      city: entity.city as string | undefined,
+      zipCode: entity.zipCode as string | undefined,
+      streetAddress: entity.streetAddress as string | undefined,
+      timeZone: entity.timeZone,
+      tokenVersion: entity.tokenVersion,
+    };
+    console.log(record);
     const validate = validator(record);
     if (!validate) {
       throw new ArgumentInvalidException(
@@ -22,21 +41,22 @@ class UserMapper implements Mapper<UserEntity, UserModel, UserResponseDto> {
   }
 
   toDomain(record: UserModel): UserEntity {
-    return new UserEntity({
+    return UserEntity.fromPersistence({
       id: record.id,
       email: record.email,
       passwordHash: record.passwordHash,
       username: record.username,
-      displayName: record.displayName,
-      bio: record.bio,
+      displayName: record.displayName ?? null,
+      bio: record.bio ?? null,
       currencyType: record.currencyType ?? "USD",
-      profilePictureUrl: record.profilePictureUrl,
-      country: record.country,
-      state: record.state,
-      city: record.city,
-      zipCode: record.zipCode,
-      streetAddress: record.streetAddress,
+      profilePictureUrl: record.profilePictureUrl ?? null,
+      country: record.country ?? null,
+      state: record.state ?? null,
+      city: record.city ?? null,
+      zipCode: record.zipCode ?? null,
+      streetAddress: record.streetAddress ?? null,
       timeZone: record.timeZone,
+      tokenVersion: record.tokenVersion,
       createdAt: record.createdAt,
       updatedAt: record.updatedAt,
     });
