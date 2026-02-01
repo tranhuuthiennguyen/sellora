@@ -15,7 +15,14 @@ export enum LogLevel {
 
 const schema = {
   type: "object",
-  required: ["NODE_ENV", "LOG_LEVEL", "API_HOST", "API_PORT", "DATABASE_URL"],
+  required: [
+    "NODE_ENV",
+    "LOG_LEVEL",
+    "API_HOST",
+    "API_PORT",
+    "DATABASE_URL",
+    "REDIS_URL",
+  ],
   properties: {
     NODE_ENV: {
       type: "string",
@@ -36,6 +43,9 @@ const schema = {
     DATABASE_URL: {
       type: "string",
     },
+    REDIS_URL: {
+      type: "string",
+    },
   },
 };
 
@@ -45,6 +55,7 @@ export type Envs = {
   API_HOST: string;
   API_PORT: string;
   DATABASE_URL: string;
+  REDIS_URL: string;
 };
 
 const env = envSchema<Envs>({
@@ -66,5 +77,8 @@ export default {
   },
   db: {
     url: env.DATABASE_URL,
+  },
+  redis: {
+    url: env.REDIS_URL,
   },
 };

@@ -1,4 +1,3 @@
-import { UserRepositoryPort } from "@/modules/user/database/user.repository.port";
 import * as bcrypt from "bcrypt";
 
 export interface PasswordServicePort {

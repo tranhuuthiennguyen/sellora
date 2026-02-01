@@ -16,9 +16,9 @@ const fastifyErrorCodesMap = {
     message: "VALIDATION_ERROR",
     error: "BAD_REQUEST",
   }),
-  FST_ERR_NOT_FOUND: () => ({
-    message: "NOT_FOUND",
-    error: "NOT_FOUND",
+  FST_ERR_NOT_FOUND: (error: any) => ({
+    message: error.message,
+    error: error.error,
     statusNode: 404,
   }),
 };

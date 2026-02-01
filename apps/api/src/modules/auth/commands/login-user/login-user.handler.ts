@@ -2,11 +2,11 @@ import { UserRepositoryPort } from "@/modules/user/database/user.repository.port
 import { authActionCreator } from "../..";
 import { LoginUserRequestDto } from "./login-user.schema";
 import { ICommandBus } from "@/core/cqrs/bus.types";
-import { InvalidCredentialsError, NotFoundException } from "@/core/exceptions";
+import { InvalidCredentialsError } from "@/core/exceptions";
 import { PasswordServicePort } from "../../services/password.service";
 import { TokenServicePort } from "../../services/jwt.token.service";
-import { UserEntity } from "@/modules/user/domain/user.entity";
 import { UserNotFoundError } from "@/modules/user/domain/user.error";
+import { UserEntity } from "@/modules/user/domain/user.entity";
 
 export type LoginUserCommandResult = Promise<{
   accessToken: string;

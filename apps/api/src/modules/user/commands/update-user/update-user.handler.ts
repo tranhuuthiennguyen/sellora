@@ -7,7 +7,7 @@ import { UserNotFoundError } from "../../domain/user.error";
 export type UpdateUserCommandResult = Promise<boolean>;
 export const updateUserCommand = userActionCreator.actionCreator<
   { userId: string } & updateUserRequestDto
->("update-user");
+>("update");
 
 class UpdateUserHandler {
   private readonly commandBus: ICommandBus;

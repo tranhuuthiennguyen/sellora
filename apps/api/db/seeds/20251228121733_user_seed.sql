@@ -13,8 +13,8 @@ INSERT INTO users (
   city,
   zip_code,
   street_address,
-  created_at,
-  updated_at
+  created_by,
+  updated_by
 )
 VALUES
 (
@@ -31,8 +31,8 @@ VALUES
   'San Francisco',
   '94105',
   '1 Market Street',
-  NOW(),
-  NOW()
+  '0bb35df6-c89c-4520-a7f0-0bd727a49c57',
+  '0bb35df6-c89c-4520-a7f0-0bd727a49c57'
 ),
 (
   '22222222-2222-2222-2222-222222222222',
@@ -48,8 +48,8 @@ VALUES
   'New York',
   '10001',
   '123 Main St',
-  NOW(),
-  NOW()
+  '0bb35df6-c89c-4520-a7f0-0bd727a49c57',
+  '0bb35df6-c89c-4520-a7f0-0bd727a49c57'
 ),
 (
   '33333333-3333-3333-3333-333333333333',
@@ -65,8 +65,8 @@ VALUES
   'Munich',
   '80331',
   'Marienplatz 1',
-  NOW(),
-  NOW()
+  '0bb35df6-c89c-4520-a7f0-0bd727a49c57',
+  '0bb35df6-c89c-4520-a7f0-0bd727a49c57'
 );
 
 -- migrate:down

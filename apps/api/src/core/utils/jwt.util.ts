@@ -15,13 +15,13 @@ const publicKey = readFileSync(
 const accessTokenSigner = createSigner({
   key: privateKey,
   algorithm: "RS256",
-  expiresIn: "10m",
+  expiresIn: "7d",
 });
 
 const refreshTokenSigner = createSigner({
   key: privateKey,
   algorithm: "RS256",
-  expiresIn: "7d",
+  expiresIn: "30d",
 });
 
 const verifier = createVerifier({

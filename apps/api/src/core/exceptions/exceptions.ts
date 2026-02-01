@@ -7,6 +7,7 @@ enum ExceptionError {
   INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR",
   DATABASE_ERROR = "DATABASE_ERROR",
   INVALID_CREDENTIALS = "INVALID_CREDENTIALS",
+  FORBIDDEN_ERROR = "FORBIDDEN_ERROR",
 }
 
 /**
@@ -38,13 +39,8 @@ export class ConflictException extends ExceptionBase {
  * @extends {ExceptionBase}
  */
 export class NotFoundException extends ExceptionBase {
-  static readonly mesasge = ExceptionError.NOT_FOUND;
   readonly statusCode = 404;
   readonly error = ExceptionError.NOT_FOUND;
-
-  constructor(message: string = NotFoundException.mesasge) {
-    super(message);
-  }
 }
 
 export class InvalidCredentialsError extends ExceptionBase {
@@ -65,6 +61,16 @@ export class InternalServerErrorException extends ExceptionBase {
 
   constructor(message: string = InternalServerErrorException.message) {
     super(message);
+  }
+}
+
+export class ForbiddenErrorException extends ExceptionBase {
+  static readonly message = "Action Forbidden";
+  readonly statusCode = 403;
+  readonly error = ExceptionError.FORBIDDEN_ERROR;
+
+  constructor() {
+    super(ForbiddenErrorException.message);
   }
 }
 

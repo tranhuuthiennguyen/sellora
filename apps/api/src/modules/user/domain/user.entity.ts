@@ -1,47 +1,14 @@
 import BaseEntity from "@/core/ddd/entity.base";
-import { CreateUserProps, PersistedUserProps } from "./user.types";
+import { CreateUserProps } from "./user.types";
+import { v4 as uuidv4 } from "uuid";
+import { UserModel } from "../database/user.model";
 
 export class UserEntity extends BaseEntity {
-  private _email: string;
-  private _passwordHash: string;
-  private _username: string;
-  private _currencyType: string;
+  private _props: UserModel;
 
-  private _displayName: string | null;
-  private _bio: string | null;
-  private _profilePictureUrl: string | null;
-  private _country: string | null;
-  private _state: string | null;
-  private _city: string | null;
-  private _zipCode: string | null;
-  private _streetAddress: string | null;
-  private _timeZone: string;
-
-  private _tokenVersion: number;
-
-  private constructor(props: PersistedUserProps) {
-    super({
-      id: props.id,
-      createdAt: props.createdAt,
-      updatedAt: props.updatedAt,
-    });
-
-    this._email = props.email;
-    this._passwordHash = props.passwordHash;
-    this._username = props.username;
-    this._currencyType = props.currencyType;
-
-    this._displayName = props.displayName ?? null;
-    this._bio = props.bio ?? null;
-    this._profilePictureUrl = props.profilePictureUrl ?? null;
-    this._country = props.country ?? null;
-    this._state = props.state ?? null;
-    this._city = props.city ?? null;
-    this._zipCode = props.zipCode ?? null;
-    this._streetAddress = props.streetAddress ?? null;
-    this._timeZone = props.timeZone;
-
-    this._tokenVersion = props.tokenVersion;
+  private constructor(props: UserModel) {
+    super(props);
+    this._props = props;
   }
 
   // ================= FACTORIES =================
@@ -53,8 +20,18 @@ export class UserEntity extends BaseEntity {
 
     const now = new Date().toISOString();
 
+    const uuid = uuidv4();
+
     return new UserEntity({
-      id: crypto.randomUUID(), // or inject externally if preferred
+      id: uuid,
+      isEnabled: true,
+      isDeleted: false,
+      createdBy: uuid,
+      createdAt: now,
+      updatedBy: uuid,
+      updatedAt: now,
+      deletedBy: null,
+      deletedAt: null,
       email: props.email,
       passwordHash: props.passwordHash,
       username: props.username,
@@ -69,62 +46,55 @@ export class UserEntity extends BaseEntity {
       zipCode: null,
       streetAddress: null,
       timeZone: "Pacific Time (US & Canada)",
-
       tokenVersion: 1,
-
-      createdAt: now,
-      updatedAt: now,
     });
   }
 
-  static fromPersistence(props: PersistedUserProps): UserEntity {
+  static fromPersistence(props: UserModel): UserEntity {
     return new UserEntity(props);
   }
 
   // ========== GETTERS ==========
   get email() {
-    return this._email;
+    return this._props.email;
   }
   get passwordHash() {
-    return this._passwordHash;
+    return this._props.passwordHash;
   }
   get username() {
-    return this._username;
+    return this._props.username;
   }
   get currencyType() {
-    return this._currencyType;
+    return this._props.currencyType;
   }
-
   get displayName() {
-    return this._displayName;
+    return this._props.displayName;
   }
   get bio() {
-    return this._bio;
+    return this._props.bio;
   }
   get profilePictureUrl() {
-    return this._profilePictureUrl;
+    return this._props.profilePictureUrl;
   }
   get country() {
-    return this._country;
+    return this._props.country;
   }
   get state() {
-    return this._state;
+    return this._props.state;
   }
   get city() {
-    return this._city;
+    return this._props.city;
   }
   get zipCode() {
-    return this._zipCode;
+    return this._props.zipCode;
   }
   get streetAddress() {
-    return this._streetAddress;
+    return this._props.streetAddress;
   }
-
   get timeZone() {
-    return this._timeZone;
+    return this._props.timeZone;
   }
-
   get tokenVersion() {
-    return this._tokenVersion;
+    return this._props.tokenVersion;
   }
 }
