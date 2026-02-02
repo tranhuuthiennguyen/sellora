@@ -1,10 +1,9 @@
 import { ICommandBus } from "@/core/cqrs/bus.types";
 import { authActionCreator } from "../..";
 import { changePasswordRequestDto } from "./change-password.schema";
-import BcryptPasswordService from "../../services/password.service";
-import { IncorrectPasswordError } from "../../domain/auth.error";
 import { UserNotFoundError } from "@/modules/user/domain/user.error";
 import { UserRepositoryPort } from "@/modules/user/database/user.repository.port";
+import { InvalidCredentialsErrorException } from "@/core/exceptions";
 
 export type ChangePasswordCommandResult = Promise<boolean>;
 export const changePasswordCommand =
@@ -12,12 +11,10 @@ export const changePasswordCommand =
 
 class ChangePasswordHandler {
   private readonly commandBus: ICommandBus;
-  private readonly passwordService: BcryptPasswordService;
   private readonly userRepository: UserRepositoryPort;
 
-  constructor({ commandBus, passwordService, userRepository }) {
+  constructor({ commandBus, userRepository }) {
     this.commandBus = commandBus;
-    this.passwordService = passwordService;
     this.userRepository = userRepository;
   }
 
@@ -28,16 +25,12 @@ class ChangePasswordHandler {
       throw new UserNotFoundError();
     }
 
-    const verified = await this.passwordService.compare(
-      oldPassword,
-      user.passwordHash,
-    );
+    const verified = await user.comparePassword(oldPassword);
     if (!verified) {
-      throw new IncorrectPasswordError();
-    } else {
-      const res = await this.passwordService.update(email, newPassword);
-      return res;
+      throw new InvalidCredentialsErrorException("Password incorrect");
     }
+    await user.changePassword(newPassword);
+    return await this.userRepository.updateOne(user);
   }
 
   init() {

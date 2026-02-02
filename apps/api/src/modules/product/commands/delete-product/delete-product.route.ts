@@ -1,6 +1,5 @@
-import { NotFoundException } from "@/core/exceptions";
 import { FastifyInstance, FastifyRequest } from "fastify";
-import { ProductNotFoundError } from "../../domain/product.error";
+
 import {
   deleteProductCommand,
   DeleteProductCommandResult,
@@ -26,20 +25,15 @@ export default async function deleteProduct(fastify: FastifyInstance) {
       }>,
       res,
     ) => {
-      try {
-        await fastify.diContainer.cradle.commandBus.execute<DeleteProductCommandResult>(
-          deleteProductCommand({ id: req.params.productId }),
-        );
-        return res.status(200).send({
-          status: "success",
-          statusCode: 200,
-          message: "PRODUCT_DELETED",
-          correlationId: getRequestId(),
-        });
-      } catch (error: any) {
-        if (error instanceof NotFoundException)
-          throw new ProductNotFoundError();
-      }
+      await fastify.diContainer.cradle.commandBus.execute<DeleteProductCommandResult>(
+        deleteProductCommand({ id: req.params.productId, sellerId: req.me.id }),
+      );
+      return res.status(200).send({
+        status: "success",
+        statusCode: 200,
+        message: "PRODUCT_DELETED",
+        correlationId: getRequestId(),
+      });
     },
   });
 }

@@ -9,6 +9,7 @@ import {
 } from "./update-user.schema";
 import { apiResponseSchema } from "@/core/api/api.response";
 import { getRequestId } from "@/core/app/app-request.context";
+import { userResponseDtoSchema } from "../../dtos/user.response.dto";
 
 export default async function updateUser(fastify: FastifyInstance) {
   fastify.route({
@@ -17,7 +18,9 @@ export default async function updateUser(fastify: FastifyInstance) {
     schema: {
       body: updateUserRequestDtoSchema,
       response: {
-        200: apiResponseSchema({}),
+        200: apiResponseSchema({
+          user: userResponseDtoSchema,
+        }),
       },
     },
     onRequest: fastify.authenticate,
@@ -30,18 +33,22 @@ export default async function updateUser(fastify: FastifyInstance) {
       res,
     ) => {
       const { userId } = req.params;
-      await fastify.diContainer.cradle.commandBus.execute<UpdateUserCommandResult>(
-        updateUserCommand({
-          userId: userId,
-          ...(req.body as updateUserRequestDto),
-        }),
-      );
 
+      const user =
+        await fastify.diContainer.cradle.commandBus.execute<UpdateUserCommandResult>(
+          updateUserCommand({
+            userId: userId,
+            ...(req.body as updateUserRequestDto),
+          }),
+        );
       return res.status(200).send({
         status: "success",
         statusCode: 200,
         message: "USER_UPDATED_SUCCESSFULLY",
         correlationId: getRequestId(),
+        data: {
+          user: fastify.diContainer.cradle.userMapper.toResponse(user),
+        },
       });
     },
   });

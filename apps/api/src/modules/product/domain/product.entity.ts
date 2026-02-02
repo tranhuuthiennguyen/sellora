@@ -1,21 +1,31 @@
 import BaseEntity from "@/core/ddd/entity.base";
-import { CreateProductProps } from "./product.types";
+import { CreateProductProps, ProductPersistedProps } from "./product.types";
 import { ProductModel } from "../database/product.model";
 import { v4 as uuidv4 } from "uuid";
+import { ArgumentInvalidException } from "@/core/exceptions";
 
 export class ProductEntity extends BaseEntity {
-  private _props: ProductModel;
+  private _props: ProductPersistedProps;
 
   private constructor(props: ProductModel) {
     super(props);
-    this._props = props;
+    this._props = {
+      sellerId: props.sellerId,
+      title: props.title,
+      description: props.description,
+      priceCents: props.priceCents,
+      status: props.status,
+      contentUpdatedAt: props.contentUpdatedAt,
+    };
   }
 
   // ================= FACTORIES =================
 
   static createNew(props: CreateProductProps): ProductEntity {
-    if (!props.sellerId) throw new Error("Product must have a seller ID");
-    if (!props.title) throw new Error("Product must have a title");
+    if (!props.sellerId)
+      throw new ArgumentInvalidException("Product must have a seller ID");
+    if (!props.title)
+      throw new ArgumentInvalidException("Product must have a title");
 
     const now = new Date().toISOString();
     const uuid = uuidv4();
@@ -53,7 +63,8 @@ export class ProductEntity extends BaseEntity {
     let changed = false;
 
     if (input.title !== undefined && input.title !== this._props.title) {
-      if (!input.title) throw new Error("Title cannot be empty");
+      if (!input.title)
+        throw new ArgumentInvalidException("Title cannot be empty");
       this._props.title = input.title;
       changed = true;
     }
@@ -62,6 +73,8 @@ export class ProductEntity extends BaseEntity {
       input.description !== undefined &&
       input.description !== this._props.description
     ) {
+      if (!input.description)
+        throw new ArgumentInvalidException("description cannot be empty");
       this._props.description = input.description;
       changed = true;
     }
@@ -70,7 +83,8 @@ export class ProductEntity extends BaseEntity {
       input.priceCents !== undefined &&
       input.priceCents !== this._props.priceCents
     ) {
-      if (input.priceCents < 0) throw new Error("Price cannot be negative");
+      if (input.priceCents < 0)
+        throw new ArgumentInvalidException("Price cannot be negative");
       this._props.priceCents = input.priceCents;
       changed = true;
     }
@@ -98,8 +112,16 @@ export class ProductEntity extends BaseEntity {
     this.touch();
   }
 
+  softDelete(deletedBy: string) {
+    if (this._isDeleted) return;
+    this._isDeleted = true;
+    this._deletedAt = new Date().toISOString();
+    this._deletedBy = deletedBy;
+  }
+
   private touch() {
     this._updatedAt = new Date().toISOString();
+    this._updatedBy = this.sellerId;
   }
 
   // ========== GETTERS ==========

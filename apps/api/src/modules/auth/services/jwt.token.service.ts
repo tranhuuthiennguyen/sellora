@@ -4,6 +4,7 @@ import {
   refreshTokenSigner,
   verifier,
 } from "@/core/utils/jwt.util";
+import { v4 as uuidv4 } from "uuid";
 
 export interface TokenServicePort {
   generateAccessToken(user: UserEntity): Promise<string>;
@@ -18,14 +19,18 @@ class JwtTokenService implements TokenServicePort {
 
   async generateAccessToken(user: UserEntity): Promise<string> {
     return await accessTokenSigner({
-      sub: user.email,
+      jti: uuidv4(),
+      sub: user.id,
+      email: user.email,
     });
   }
 
   async generateRefreshToken(user: UserEntity): Promise<string> {
     return await refreshTokenSigner({
+      jti: uuidv4(),
+      sub: user.id,
+      email: user.email,
       tokenVersion: user.tokenVersion,
-      sub: user.email,
     });
   }
 }

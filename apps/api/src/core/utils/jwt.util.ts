@@ -1,3 +1,4 @@
+import { env } from "@/config";
 import { createSigner, createVerifier } from "fast-jwt";
 import { readFileSync } from "fs";
 import path from "path";
@@ -16,12 +17,14 @@ const accessTokenSigner = createSigner({
   key: privateKey,
   algorithm: "RS256",
   expiresIn: "7d",
+  iss: env.server.host,
 });
 
 const refreshTokenSigner = createSigner({
   key: privateKey,
   algorithm: "RS256",
   expiresIn: "30d",
+  iss: env.server.host,
 });
 
 const verifier = createVerifier({

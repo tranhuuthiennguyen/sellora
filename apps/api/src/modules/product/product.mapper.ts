@@ -55,7 +55,7 @@ class ProductMapper implements Mapper<
       updatedAt: record.updatedAt,
       sellerId: record.sellerId,
       title: record.title,
-      description: record.description ?? null,
+      description: record.description,
       priceCents: record.priceCents,
       status: record.status,
       contentUpdatedAt: record.contentUpdatedAt,

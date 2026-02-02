@@ -1,4 +1,24 @@
 -- migrate:up
+CREATE TABLE roles (
+	id SERIAL PRIMARY KEY,
+	name VARCHAR(255) NOT NULL UNIQUE,
+	description TEXT,
+	created_at TIMESTAMP DEFAULT now()
+);
+
+CREATE TABLE permissions (
+	id SERIAL PRIMARY KEY,
+	name VARCHAR(255) NOT NULL UNIQUE,
+	description TEXT,
+	created_at TIMESTAMP DEFAULT now()
+);
+
+CREATE TABLE role_permissions (
+	role_id INT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
+	permission_id INT NOT NULL REFERENCES permissions(id) ON DELETE CASCADE,
+	PRIMARY KEY(role_id, permission_id)
+);
+
 CREATE TABLE users (
 	id VARCHAR(255) PRIMARY KEY NOT NULL,
 	email VARCHAR(255) NOT NULL,
@@ -28,5 +48,15 @@ CREATE TABLE users (
 	CONSTRAINT users_username_unique UNIQUE("username")
 );
 
+CREATE TABLE user_roles (
+	user_id VARCHAR(255) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+	role_id INT NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
+	PRIMARY KEY(user_id, role_id)
+);
+
 -- migrate:down
+DROP TABLE user_roles;
 DROP TABLE users
+DROP TABLE role_permissions
+DROP TABLE permissions
+DROP TABLE roles

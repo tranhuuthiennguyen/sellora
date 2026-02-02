@@ -1,3 +1,4 @@
+import { CacheServicePort } from "@/core/cache/cache-service.port";
 import { ICommandBus, IEventBus } from "@/core/cqrs/bus.types";
 import PostgresDB from "@/core/db/postgres";
 import { asValue } from "awilix";
@@ -11,6 +12,7 @@ declare global {
     queryBus: ICommandBus;
     commandBus: ICommandBus;
     eventBus: IEventBus;
+    cacheService: CacheServicePort;
   }
 }
 
@@ -21,11 +23,13 @@ export function makeDependencies({
   queryBus,
   commandBus,
   eventBus,
+  cacheService,
 }: {
   logger: FastifyBaseLogger;
   queryBus: ICommandBus;
   commandBus: ICommandBus;
   eventBus: IEventBus;
+  cacheService: CacheServicePort;
 }) {
   return {
     logger: asValue(logger),
@@ -33,5 +37,6 @@ export function makeDependencies({
     queryBus: asValue(queryBus),
     commandBus: asValue(commandBus),
     eventBus: asValue(eventBus),
+    cacheService: asValue(cacheService),
   };
 }

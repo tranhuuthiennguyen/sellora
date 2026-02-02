@@ -12,6 +12,23 @@ class ProductRepository
     super(db, "products", productMapper, logger);
   }
 
+  async softDeleteOne(entity: ProductEntity): Promise<boolean> {
+    try {
+      const result = await this.db`
+        UPDATE ${this.db(this.tableName)}
+        SET
+          is_deleted = ${entity.isDeleted},
+          deleted_at = ${entity.deletedAt},
+          deleted_by = ${entity.deletedBy}
+        WHERE id = ${entity.id}
+        RETURNING *
+      `;
+      return result.length > 0;
+    } catch (error: any) {
+      throw new DatabaseErrorException("Unknown database error", error);
+    }
+  }
+
   async updateOne(entity: ProductEntity) {
     try {
       const rows = await this.db`
@@ -22,6 +39,7 @@ class ProductRepository
           price_cents = ${entity.priceCents},
           status = ${entity.status},
           updated_at = ${entity.contentUpdatedAt},
+          updated_by = ${entity.updatedBy},
           content_updated_at = ${entity.contentUpdatedAt}
         WHERE id = ${entity.id}
         RETURNING *

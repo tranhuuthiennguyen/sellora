@@ -1,7 +1,8 @@
 import { env } from "@/config";
 import { createClient, RedisClientType } from "redis";
+import { CacheServicePort } from "./cache-service.port";
 
-class RedisService {
+class RedisService implements CacheServicePort {
   private client: RedisClientType | null = null;
   private url: string;
 
@@ -44,4 +45,4 @@ class RedisService {
   }
 }
 
-export default new RedisService();
+export default RedisService;

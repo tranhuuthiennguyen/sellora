@@ -1,8 +1,14 @@
+import { BasePersistedProps } from "@/core/ddd/model.base";
 import { ProductModel } from "../database/product.model";
 
 export type ProductStatus = "draft" | "published";
 
-export type CreateProductProps = Pick<
+export type ProductPersistedProps = Omit<
   ProductModel,
-  "sellerId" | "title" | "description" | "priceCents" | "status"
+  keyof BasePersistedProps
+>;
+
+export type CreateProductProps = Omit<
+  ProductPersistedProps,
+  "contentUpdatedAt"
 >;

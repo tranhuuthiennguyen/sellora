@@ -23,8 +23,8 @@ class UpdateProductHandler {
   async handler({ payload }: ReturnType<typeof updateProductCommand>) {
     const { id, userId, ...input } = payload;
     const product = await this._productRepository.findOneById(id);
-    if (!product) throw new ProductNotFoundError();
 
+    if (!product || product.isDeleted) throw new ProductNotFoundError();
     const sellerId = product.sellerId;
 
     if (sellerId !== userId) {

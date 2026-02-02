@@ -20,6 +20,7 @@ export default async function createProduct(fastify: FastifyInstance) {
         200: createProductResponseDtoSchema,
       },
     },
+    onRequest: fastify.authenticate,
     handler: async (req, res) => {
       const id =
         await fastify.diContainer.cradle.commandBus.execute<CreateProductCommandResult>(

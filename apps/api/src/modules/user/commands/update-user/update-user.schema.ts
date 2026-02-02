@@ -12,6 +12,7 @@ export const updateUserRequestDtoSchema = Type.Partial(
     "updatedAt",
     "deletedBy",
     "deletedAt",
+    "email",
     "passwordHash",
     "tokenVersion",
   ]),

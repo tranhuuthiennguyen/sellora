@@ -3,8 +3,9 @@ import { userActionCreator } from "../..";
 import { updateUserRequestDto } from "./update-user.schema";
 import { UserRepositoryPort } from "../../database/user.repository.port";
 import { UserNotFoundError } from "../../domain/user.error";
+import { UserEntity } from "../../domain/user.entity";
 
-export type UpdateUserCommandResult = Promise<boolean>;
+export type UpdateUserCommandResult = Promise<UserEntity>;
 export const updateUserCommand = userActionCreator.actionCreator<
   { userId: string } & updateUserRequestDto
 >("update");
@@ -24,7 +25,8 @@ class UpdateUserHandler {
     if (!user) {
       throw new UserNotFoundError();
     }
-    await this.userRepository.updateOneById(userId, updates);
+    user.updateDetails(updates);
+    return await this.userRepository.updateOne(user);
   }
 
   init() {

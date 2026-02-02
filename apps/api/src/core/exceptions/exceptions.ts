@@ -43,9 +43,14 @@ export class NotFoundException extends ExceptionBase {
   readonly error = ExceptionError.NOT_FOUND;
 }
 
-export class InvalidCredentialsError extends ExceptionBase {
+export class InvalidCredentialsErrorException extends ExceptionBase {
   readonly statusCode = 401;
   readonly error = ExceptionError.INVALID_CREDENTIALS;
+  static readonly message = ExceptionError.INVALID_CREDENTIALS;
+
+  constructor(message: string = InvalidCredentialsErrorException.message) {
+    super(message);
+  }
 }
 
 /**
@@ -69,8 +74,8 @@ export class ForbiddenErrorException extends ExceptionBase {
   readonly statusCode = 403;
   readonly error = ExceptionError.FORBIDDEN_ERROR;
 
-  constructor() {
-    super(ForbiddenErrorException.message);
+  constructor(message: string = ForbiddenErrorException.message) {
+    super(message);
   }
 }
 

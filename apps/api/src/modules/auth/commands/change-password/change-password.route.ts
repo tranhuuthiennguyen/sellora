@@ -9,7 +9,7 @@ import {
 } from "./change-password.schema";
 import { apiResponseSchema } from "@/core/api/api.response";
 import { getRequestId } from "@/core/app/app-request.context";
-import { InvalidCredentialsError } from "@/core/exceptions";
+import { InvalidCredentialsErrorException } from "@/core/exceptions";
 
 export default async function changePassword(fastify: FastifyInstance) {
   fastify.route({
@@ -25,7 +25,7 @@ export default async function changePassword(fastify: FastifyInstance) {
     handler: async (req, res) => {
       const body = req.body as changePasswordRequestDto;
       if (req.me.email !== body.email) {
-        throw new InvalidCredentialsError("INVALID_EMAIL_ADDRESS");
+        throw new InvalidCredentialsErrorException("Invalid Email Address");
       }
       await fastify.commandBus.execute<ChangePasswordCommandResult>(
         changePasswordCommand(body),
@@ -33,7 +33,7 @@ export default async function changePassword(fastify: FastifyInstance) {
       return res.status(200).send({
         status: "success",
         statusCode: 200,
-        message: "PASSWORD_UPDATED_SUCCESSFULLY",
+        message: "Password Update Successfully",
         correlationId: getRequestId(),
       });
     },

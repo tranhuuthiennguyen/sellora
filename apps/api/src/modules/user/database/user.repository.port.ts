@@ -4,5 +4,5 @@ import { UserEntity } from "../domain/user.entity";
 export interface UserRepositoryPort extends RepositoryPort<UserEntity> {
   findOneByEmail(email: string): Promise<UserEntity | undefined>;
   findOneByUsername(username: string): Promise<UserEntity | undefined>;
-  updateOneById(id: string, records: Record<any, any>): Promise<any>;
+  updateOne(entity: UserEntity): Promise<UserEntity>;
 }

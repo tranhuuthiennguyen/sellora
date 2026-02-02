@@ -2,6 +2,7 @@ import SqlRepositoryBase from "@/core/db/sql-repository.base";
 import { UserEntity } from "../domain/user.entity";
 import { UserRepositoryPort } from "./user.repository.port";
 import { UserModel } from "./user.model";
+import { DatabaseErrorException } from "@/core/exceptions";
 
 class UserRepository
   extends SqlRepositoryBase<UserEntity, UserModel>
@@ -11,9 +12,31 @@ class UserRepository
     super(db, "users", userMapper, logger);
   }
 
-  async updateOneById(id: string, records: Record<string, any>): Promise<any> {
-    return await this
-      .db`UPDATE ${this.db(this.tableName)} SET ${this.db(records, ...Object.keys(records))} WHERE id = ${id}`;
+  async updateOne(entity: UserEntity): Promise<UserEntity> {
+    try {
+      const rows = await this.db`
+        UPDATE ${this.db(this.tableName)}
+        SET
+          username = ${entity.username},
+          display_name = ${entity.displayName},
+          bio = ${entity.bio},
+          currency_type = ${entity.currencyType},
+          profile_picture_url = ${entity.profilePictureUrl},
+          country = ${entity.country},
+          state = ${entity.state},
+          city = ${entity.city},
+          zip_code = ${entity.zipCode},
+          street_address = ${entity.streetAddress},
+          time_zone = ${entity.timeZone},
+          updated_at = ${entity.updatedAt},
+          updated_by = ${entity.updatedBy}
+        WHERE id = ${entity.id}
+        RETURNING *
+      `;
+      return this.mapper.toDomain(rows[0]);
+    } catch (error: any) {
+      throw new DatabaseErrorException("Unknown database error", error);
+    }
   }
 
   async findOneByUsername(username: string): Promise<UserEntity | undefined> {

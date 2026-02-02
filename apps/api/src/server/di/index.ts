@@ -13,6 +13,7 @@ export async function di(fastify: FastifyInstance) {
         queryBus: fastify.queryBus,
         commandBus: fastify.commandBus,
         eventBus: fastify.eventBus,
+        cacheService: fastify.cacheService,
       }),
     })
     .loadModules(
