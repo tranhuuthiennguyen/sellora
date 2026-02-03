@@ -23,7 +23,7 @@ class UserMapper implements Mapper<UserEntity, UserModel, UserResponseDto> {
       id: entity.id,
       isEnabled: entity.isEnabled,
       isDeleted: entity.isDeleted,
-      createdBy: entity.createBy,
+      createdBy: entity.createdBy,
       updatedBy: entity.updatedBy,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
@@ -44,6 +44,8 @@ class UserMapper implements Mapper<UserEntity, UserModel, UserResponseDto> {
       timeZone: entity.timeZone,
       tokenVersion: entity.tokenVersion,
     };
+
+    console.log(entity);
 
     const validate = validator(record);
     if (!validate) {
@@ -98,7 +100,7 @@ class UserMapper implements Mapper<UserEntity, UserModel, UserResponseDto> {
       id: entity.id,
       isEnabled: entity.isEnabled,
       isDeleted: entity.isDeleted,
-      createdBy: entity.createBy,
+      createdBy: entity.createdBy,
       createdAt: entity.createdAt,
       updatedBy: entity.updatedBy,
       updatedAt: entity.updatedAt,

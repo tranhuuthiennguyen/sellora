@@ -21,6 +21,16 @@ export default async function createProduct(fastify: FastifyInstance) {
       },
     },
     onRequest: fastify.authenticate,
+    preHandler: async (req, _, done) => {
+      try {
+        await fastify.diContainer.cradle.authorizationService.authorize(
+          req.me.id,
+          "product.create",
+        );
+      } catch (error: any) {
+        done(error);
+      }
+    },
     handler: async (req, res) => {
       const id =
         await fastify.diContainer.cradle.commandBus.execute<CreateProductCommandResult>(

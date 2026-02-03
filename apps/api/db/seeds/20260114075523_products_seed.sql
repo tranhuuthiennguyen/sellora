@@ -32,63 +32,63 @@ VALUES
 ),
 (
   'd299b763-cabc-455c-8005-b68402451512',
-  '22222222-2222-2222-2222-222222222222',
+  'afae806d-f661-4227-a494-c965a51db5ee',
   'Personal Finance Tracker',
   'Track expenses and income easily.',
   4999,
   'published',
-  '22222222-2222-2222-2222-222222222222',
-  '22222222-2222-2222-2222-222222222222'
+  'afae806d-f661-4227-a494-c965a51db5ee',
+  'afae806d-f661-4227-a494-c965a51db5ee'
 ),
 (
   'c6e22ed7-db4d-4e21-b330-f86305e156dc',
-  '22222222-2222-2222-2222-222222222222',
+  'afae806d-f661-4227-a494-c965a51db5ee',
   'Daily Productivity Planner',
   'Boost productivity with daily planning.',
   2999,
   'draft',
-  '22222222-2222-2222-2222-222222222222',
-  '22222222-2222-2222-2222-222222222222'
+  'afae806d-f661-4227-a494-c965a51db5ee',
+  'afae806d-f661-4227-a494-c965a51db5ee'
 ),
 (
   '07542c4b-f0c0-4806-a205-2ac0a1a5e2a7',
-  '22222222-2222-2222-2222-222222222222',
+  'afae806d-f661-4227-a494-c965a51db5ee',
   'Minimal Resume Template',
   'Clean and minimal resume template.',
   1500,
   'published',
-  '22222222-2222-2222-2222-222222222222',
-  '22222222-2222-2222-2222-222222222222'
+  'afae806d-f661-4227-a494-c965a51db5ee',
+  'afae806d-f661-4227-a494-c965a51db5ee'
 ),
 (
   '34d62bfe-0947-45a5-96da-4b6edd32d492',
-  '33333333-3333-3333-3333-333333333333',
+  '0041d5de-6cf9-4e00-b3b7-675f19bb9771',
   'Coffee Lovers Recipe Book',
   'A collection of coffee recipes from around the world.',
   2599,
   'published',
-  '22222222-2222-2222-2222-222222222222',
-  '22222222-2222-2222-2222-222222222222'
+  'afae806d-f661-4227-a494-c965a51db5ee',
+  'afae806d-f661-4227-a494-c965a51db5ee'
 ),
 (
   'ffa94d30-b2fa-429a-b45c-a9cff284518b',
-  '33333333-3333-3333-3333-333333333333',
+  '0041d5de-6cf9-4e00-b3b7-675f19bb9771',
   'JavaScript Cheatsheet',
   'Quick reference for modern JavaScript.',
   1200,
   'draft',
-  '33333333-3333-3333-3333-333333333333',
-  '33333333-3333-3333-3333-333333333333'
+  '0041d5de-6cf9-4e00-b3b7-675f19bb9771',
+  '0041d5de-6cf9-4e00-b3b7-675f19bb9771'
 ),
 (
   '853b3927-cf0e-4fc1-b313-639a12b9adc2',
-  '33333333-3333-3333-3333-333333333333',
+  '0041d5de-6cf9-4e00-b3b7-675f19bb9771',
   'TypeScript Advanced Patterns',
   'Deep dive into advanced TypeScript usage.',
   4500,
   'published',
-  '33333333-3333-3333-3333-333333333333',
-  '33333333-3333-3333-3333-333333333333'
+  '0041d5de-6cf9-4e00-b3b7-675f19bb9771',
+  '0041d5de-6cf9-4e00-b3b7-675f19bb9771'
 ),
 (
   '10bf2398-8d92-419c-9161-fbf02c9f2a1a',
@@ -102,13 +102,13 @@ VALUES
 ),
 (
   '05868cb0-a5fa-4a82-9172-e89af5e89f64',
-  '22222222-2222-2222-2222-222222222222',
+  'afae806d-f661-4227-a494-c965a51db5ee',
   'Remote Work Handbook',
   'Best practices for effective remote work.',
   2799,
   'draft',
-  '22222222-2222-2222-2222-222222222222',
-  '22222222-2222-2222-2222-222222222222'
+  'afae806d-f661-4227-a494-c965a51db5ee',
+  'afae806d-f661-4227-a494-c965a51db5ee'
 );
 
 -- migrate:down

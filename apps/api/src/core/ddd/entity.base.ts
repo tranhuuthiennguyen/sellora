@@ -42,7 +42,7 @@ abstract class BaseEntity {
     return this._isDeleted;
   }
 
-  get createBy() {
+  get createdBy() {
     return this._createdBy;
   }
 

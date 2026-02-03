@@ -24,21 +24,19 @@ class UpdateProductHandler {
     const { id, userId, ...input } = payload;
     const product = await this._productRepository.findOneById(id);
 
+    // check if product exists in database
     if (!product || product.isDeleted) throw new ProductNotFoundError();
     const sellerId = product.sellerId;
 
+    // disallow cross owner
     if (sellerId !== userId) {
       throw new ForbiddenErrorException();
     }
 
-    product.updateDetails(input);
-
-    if (input.status !== undefined && input.status === "published") {
-      product.publish();
-    }
-
-    if (input.status !== undefined && input.status === "draft") {
-      product.unpublish();
+    // check not change
+    if (!product.updateDetails(input)) {
+      console.log("product details doesnt change");
+      return product;
     }
 
     return await this._productRepository.updateOne(product);

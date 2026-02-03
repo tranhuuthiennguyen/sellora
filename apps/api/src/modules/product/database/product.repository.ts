@@ -38,7 +38,7 @@ class ProductRepository
           description = ${entity.description},
           price_cents = ${entity.priceCents},
           status = ${entity.status},
-          updated_at = ${entity.contentUpdatedAt},
+          updated_at = ${entity.updatedAt},
           updated_by = ${entity.updatedBy},
           content_updated_at = ${entity.contentUpdatedAt}
         WHERE id = ${entity.id}

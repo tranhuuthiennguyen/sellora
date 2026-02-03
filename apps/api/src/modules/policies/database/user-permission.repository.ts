@@ -1,7 +1,7 @@
 import { PermissionModel, RoleModel } from "./permission.model";
 import { UserPermissionRepositoryPort } from "./user-permission.repository.port";
 
-export class UserPermissionRepository implements UserPermissionRepositoryPort {
+export default class UserPermissionRepository implements UserPermissionRepositoryPort {
   private readonly _db: Dependencies["db"];
 
   constructor({ db }) {
@@ -69,7 +69,7 @@ export class UserPermissionRepository implements UserPermissionRepositoryPort {
 
   async getPermissionsByUserId(userId: string): Promise<PermissionModel[]> {
     const result = await this._db`
-      SELECT DESTINCT p.id, p.name, p.description
+      SELECT DISTINCT p.id, p.name, p.description
       FROM permissions p
       INNER JOIN role_permissions rp ON p.id = rp.permission_id
       INNER JOIN roles r ON r.id = rp.role_id

@@ -4,4 +4,5 @@ export interface CacheServicePort {
   get: <T = any>(key: string) => Promise<T | null>;
   set: (key: string, value: unknown, ttlSeconds?: number) => Promise<void>;
   del: (key: string) => Promise<void>;
+  increment: (key: string) => Promise<number>;
 }

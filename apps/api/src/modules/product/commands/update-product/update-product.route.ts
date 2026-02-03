@@ -15,7 +15,6 @@ export default async function updateProduct(fastify: FastifyInstance) {
   fastify.route({
     method: "PATCH",
     url: "/v1/products/:productId",
-    onRequest: fastify.authenticate,
     schema: {
       body: updateProductRequestDtoSchema,
       response: {
@@ -23,6 +22,25 @@ export default async function updateProduct(fastify: FastifyInstance) {
           product: productResponseDtoSchema,
         }),
       },
+    },
+    onRequest: fastify.authenticate,
+    preHandler: async (
+      req: FastifyRequest<{
+        Params: {
+          productId: string;
+        };
+      }>,
+      _,
+      done,
+    ) => {
+      try {
+        await fastify.diContainer.cradle.authorizationService.authorize(
+          req.me.id,
+          "product.update.own",
+        );
+      } catch (error: any) {
+        done(error);
+      }
     },
     handler: async (
       req: FastifyRequest<{

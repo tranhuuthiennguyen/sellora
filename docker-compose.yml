@@ -46,6 +46,19 @@ services:
       retries: 5
     networks:
       - backend
+      
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    restart: unless-stopped
+    container_name: redis-commander
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    networks:
+      - backend
 
   s3:
     image: minio/minio

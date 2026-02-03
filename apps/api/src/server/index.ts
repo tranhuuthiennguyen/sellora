@@ -58,9 +58,6 @@ export class Server {
     await this.fastify.register(AutoLoad, {
       dir: path.join(__dirname, "../modules"),
       dirNameRoutePrefix: false,
-      options: {
-        autoPrefix: "api",
-      },
       matchFilter: (filePath) => {
         const regex = env.isProduction
           ? /.(route|resolver).js$/

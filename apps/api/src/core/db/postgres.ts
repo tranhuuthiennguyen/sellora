@@ -4,6 +4,15 @@ import postgres from "postgres";
 
 const sql = postgres(env.db.url, {
   transform: postgres.camel,
+  // pg client return Date object as default
+  types: {
+    date: {
+      to: 1184,
+      from: [1082, 1114, 1184],
+      serialize: (x: Date | string) => x,
+      parse: (x: string) => x,
+    },
+  },
   debug: (
     conn: number,
     query: string,

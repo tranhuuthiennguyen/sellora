@@ -1,10 +1,7 @@
 import { CacheServicePort } from "../../../core/cache/cache-service.port";
 import { UserPermissionRepositoryPort } from "../database/user-permission.repository.port";
 import { AuthorizationServicePort } from "./authorization.service.port";
-import {
-  ForbiddenErrorException,
-  InvalidCredentialsErrorException,
-} from "@/core/exceptions";
+import { ForbiddenErrorException } from "@/core/exceptions";
 
 export default class AuthorizationService implements AuthorizationServicePort {
   private readonly _cacheService: CacheServicePort;
@@ -26,12 +23,38 @@ export default class AuthorizationService implements AuthorizationServicePort {
     }
   }
 
-  authorizeAny(userId: string, requiredPermissions: string[]): Promise<void> {
-    throw new Error();
+  async authorizeAny(
+    userId: string,
+    requiredPermissions: string[],
+  ): Promise<void> {
+    const permissions = await this._getUserPermissions(userId);
+
+    const hasPermission = requiredPermissions.some((permission) =>
+      permissions.includes(permission),
+    );
+
+    if (!hasPermission) {
+      throw new ForbiddenErrorException(
+        `User does not have any of the required permissions: ${requiredPermissions.join(", ")}`,
+      );
+    }
   }
 
-  authorizeAll(userId: string, requiredPermissions: string[]): Promise<void> {
-    throw new Error();
+  async authorizeAll(
+    userId: string,
+    requiredPermissions: string[],
+  ): Promise<void> {
+    const permissions = await this._getUserPermissions(userId);
+
+    const hasAllPermissions = requiredPermissions.every((permission) =>
+      permissions.includes(permission),
+    );
+
+    if (!hasAllPermissions) {
+      throw new ForbiddenErrorException(
+        `User does not have all required permissions: ${requiredPermissions.join(", ")}`,
+      );
+    }
   }
 
   async _getUserPermissions(userId: string): Promise<string[]> {
@@ -58,7 +81,8 @@ export default class AuthorizationService implements AuthorizationServicePort {
     return permissionNames;
   }
 
-  invalidateUserPermissionCache(userId: string): Promise<void> {
-    throw new Error();
+  async invalidateUserPermissionCache(userId: string): Promise<void> {
+    const cacheKey = `permissions:${userId}`;
+    await this._cacheService.del(cacheKey);
   }
 }

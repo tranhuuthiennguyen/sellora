@@ -5,13 +5,20 @@ INSERT INTO roles (name, description) VALUES
 
 -- Insert permissions
 INSERT INTO permissions (name, description) VALUES
-  ('create_products', 'Can create products'),
-  ('update_products', 'Can update products'),
-  ('buy_products', 'Can purchase products'),
-  ('manage_users', 'Can manage platform users'),
-  ('view_analytics', 'Can view analytics'),
-  ('manage_roles', 'Can manage roles and permissions'),
-  ('manage_platform', 'Can manage platform settings');
+  ('product.create', 'Create own products'),
+  ('product.view.own', 'View own non-deleted products'),
+  ('product.update.own', 'Update own products'),
+  ('product.delete.own', 'Delete own products'),
+  ('product.view.any', 'View any non-deleted products'),
+  ('product.update.any', 'Update any products'),
+  ('product.delete.any', 'Delete any products'),
+  ('product.view.deleted', 'View deleted products'),
+  ('product.buy', 'Can purchase products'),
+  ('user.create', 'Create own user'),
+  ('user.update.own', 'Update own user'),
+  ('user.delete.own', 'Delete own user'),
+  ('user.update.any', 'Update any user'),
+  ('user.delete.any', 'Delete any user');
 
 -- Assign all permissions to admin role
 INSERT INTO role_permissions (role_id, permission_id)
@@ -20,7 +27,14 @@ SELECT r.id, p.id FROM roles r, permissions p WHERE r.name = 'admin';
 -- Assign basic permissions to user role
 INSERT INTO role_permissions (role_id, permission_id)
 SELECT r.id, p.id FROM roles r, permissions p 
-WHERE r.name = 'user' AND p.name IN ('create_products', 'buy_products', 'view_analytics');
+WHERE r.name = 'user' AND p.name IN (
+  'product.create',
+  'product.view.own',
+  'product.update.own',
+  'product.delete.own',
+  'user.create',
+  'user.update.own'
+);
 
 INSERT INTO users (
   id,
@@ -42,8 +56,8 @@ INSERT INTO users (
 VALUES
 (
   '0bb35df6-c89c-4520-a7f0-0bd727a49c57',
-  'admin@example.com',
-  '$2a$10$8vkiYN0js.odlUu52TI7zey2NFKlEmShoiuUkfF1xTixM6RQIHsNm',
+  'sysadmin@sellora.com',
+  '$2a$10$8vkiYN0js.odlUu52TI7zey2NFKlEmShoiuUkfF1xTixM6RQIHsNm', -- Thientai@123
   'admin_user',
   'Admin User',
   'System administrator account',
@@ -58,9 +72,9 @@ VALUES
   '0bb35df6-c89c-4520-a7f0-0bd727a49c57'
 ),
 (
-  '22222222-2222-2222-2222-222222222222',
+  'afae806d-f661-4227-a494-c965a51db5ee',
   'john.doe@example.com',
-  '$2b$10$abcdefghijklmnopqrstuvJohnHash1',
+  '$2a$10$eyMwr0doRYWcIzl9CULyZ.2qYRvVbPz6M8XMhWjF4FXdpgkzzwdyG', -- John@123
   'johndoe',
   'John Doe',
   'Just a normal user',
@@ -75,7 +89,7 @@ VALUES
   '0bb35df6-c89c-4520-a7f0-0bd727a49c57'
 ),
 (
-  '33333333-3333-3333-3333-333333333333',
+  '0041d5de-6cf9-4e00-b3b7-675f19bb9771',
   'jane.doe@example.com',
   '$2b$10$abcdefghijklmnopqrstuvJaneHash2',
   'janedoe',
@@ -96,8 +110,8 @@ VALUES
 INSERT INTO user_roles (user_id, role_id)
 VALUES
   ('0bb35df6-c89c-4520-a7f0-0bd727a49c57', (SELECT id FROM roles WHERE name = 'admin')),
-  ('22222222-2222-2222-2222-222222222222', (SELECT id FROM roles WHERE name = 'user')),
-  ('33333333-3333-3333-3333-333333333333', (SELECT id FROM roles WHERE name = 'user'));
+  ('afae806d-f661-4227-a494-c965a51db5ee', (SELECT id FROM roles WHERE name = 'user')),
+  ('0041d5de-6cf9-4e00-b3b7-675f19bb9771', (SELECT id FROM roles WHERE name = 'user'));
 
 -- migrate:down
 DELETE FROM user_roles;

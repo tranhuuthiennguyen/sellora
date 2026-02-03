@@ -18,6 +18,7 @@ const accessTokenSigner = createSigner({
   algorithm: "RS256",
   expiresIn: "7d",
   iss: env.server.host,
+  aud: env.server.host,
 });
 
 const refreshTokenSigner = createSigner({
@@ -25,11 +26,14 @@ const refreshTokenSigner = createSigner({
   algorithm: "RS256",
   expiresIn: "30d",
   iss: env.server.host,
+  aud: env.server.host,
 });
 
 const verifier = createVerifier({
   key: publicKey,
   algorithms: ["RS256"],
+  allowedIss: env.server.host,
+  allowedAud: env.server.host,
 });
 
 export { accessTokenSigner, refreshTokenSigner, verifier };

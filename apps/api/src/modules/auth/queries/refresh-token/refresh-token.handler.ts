@@ -1,8 +1,8 @@
 import { UserRepositoryPort } from "@/modules/user/database/user.repository.port";
 import { authActionCreator } from "../..";
 import { TokenServicePort } from "../../services/jwt.token.service";
-import { InvalidCredentialsError } from "@/core/exceptions";
 import { UserNotFoundError } from "@/modules/user/domain/user.error";
+import { InvalidCredentialsErrorException } from "@/core/exceptions";
 
 export type RefreshTokenQueryResult = Promise<{
   accessToken: string;
@@ -25,22 +25,23 @@ class RefreshTokenHandler {
   async handler({
     payload,
   }: ReturnType<typeof refreshTokenQuery>): RefreshTokenQueryResult {
-    const decoded = await this.jwtTokenService.verify(payload);
+    try {
+      const decoded = await this.jwtTokenService.verify(payload);
 
-    const user = await this.userRepository.findOneByEmail(decoded.sub);
+      const user = await this.userRepository.findOneByEmail(decoded.email);
 
-    if (!user) throw new UserNotFoundError();
+      if (!user) throw new UserNotFoundError();
 
-    if (decoded.tokenVersion !== user.tokenVersion)
-      throw new InvalidCredentialsError("Refresh token revoked");
+      const accessToken = await this.jwtTokenService.generateAccessToken(user);
+      const newRefresh = await this.jwtTokenService.generateRefreshToken(user);
 
-    const accessToken = await this.jwtTokenService.generateAccessToken(user);
-    const newRefresh = await this.jwtTokenService.generateRefreshToken(user);
-
-    return {
-      accessToken,
-      refreshToken: newRefresh,
-    };
+      return {
+        accessToken,
+        refreshToken: newRefresh,
+      };
+    } catch (error: any) {
+      throw new InvalidCredentialsErrorException(error.message);
+    }
   }
 
   init() {

@@ -17,6 +17,24 @@ export default async function deleteProduct(fastify: FastifyInstance) {
       },
     },
     onRequest: fastify.authenticate,
+    preHandler: async (
+      req: FastifyRequest<{
+        Params: {
+          productId: string;
+        };
+      }>,
+      _,
+      done,
+    ) => {
+      try {
+        await fastify.diContainer.cradle.authorizationService.authorize(
+          req.me.id,
+          "product.delete.own",
+        );
+      } catch (error: any) {
+        done(error);
+      }
+    },
     handler: async (
       req: FastifyRequest<{
         Params: {

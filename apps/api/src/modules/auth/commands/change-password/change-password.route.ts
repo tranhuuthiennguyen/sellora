@@ -9,7 +9,10 @@ import {
 } from "./change-password.schema";
 import { apiResponseSchema } from "@/core/api/api.response";
 import { getRequestId } from "@/core/app/app-request.context";
-import { InvalidCredentialsErrorException } from "@/core/exceptions";
+import {
+  ForbiddenErrorException,
+  InvalidCredentialsErrorException,
+} from "@/core/exceptions";
 
 export default async function changePassword(fastify: FastifyInstance) {
   fastify.route({
@@ -22,10 +25,23 @@ export default async function changePassword(fastify: FastifyInstance) {
       },
     },
     onRequest: fastify.authenticate,
+    preHandler: async (req, _, done) => {
+      try {
+        await fastify.diContainer.cradle.authorizationService.authorize(
+          req.me.id,
+          "user.update.own",
+        );
+      } catch (error: any) {
+        done(error);
+      }
+    },
     handler: async (req, res) => {
       const body = req.body as changePasswordRequestDto;
+      req.log.error(
+        `User ${req.me.email} attemp to change password for User ${body.email}`,
+      );
       if (req.me.email !== body.email) {
-        throw new InvalidCredentialsErrorException("Invalid Email Address");
+        throw new ForbiddenErrorException("Action denied");
       }
       await fastify.commandBus.execute<ChangePasswordCommandResult>(
         changePasswordCommand(body),

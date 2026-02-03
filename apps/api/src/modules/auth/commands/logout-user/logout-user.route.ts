@@ -13,13 +13,15 @@ export default async function logoutUser(fastify: FastifyInstance) {
     },
     onRequest: fastify.authenticate,
     handler: async (req, res) => {
-      const user = req.me;
-      const pumpToken = user!.tokenVersion + 1;
-      await fastify.diContainer.cradle.db`
-        UPDATE users
-        SET token_version = ${pumpToken}
-        WHERE email = ${user!.email}
-      `;
+      const token = req.headers.authorization!.split(" ")[1];
+      await fastify.diContainer.cradle.jwtTokenService.revokeToken(token);
+      // logout from all devices
+      // const pumpToken = user!.tokenVersion + 1;
+      // await fastify.diContainer.cradle.db`
+      //   UPDATE users
+      //   SET token_version = ${pumpToken}
+      //   WHERE email = ${user!.email}
+      // `;
       return res
         .clearCookie("refreshToken", {
           path: "/",
@@ -31,7 +33,7 @@ export default async function logoutUser(fastify: FastifyInstance) {
         .send({
           status: "success",
           statusCode: 200,
-          message: "USER_LOGOUT_SUCCESSFULLY",
+          message: "User logout successfully",
           correlationId: getRequestId(),
         });
     },

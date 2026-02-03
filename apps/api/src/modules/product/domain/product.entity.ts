@@ -1,5 +1,9 @@
 import BaseEntity from "@/core/ddd/entity.base";
-import { CreateProductProps, ProductPersistedProps } from "./product.types";
+import {
+  CreateProductProps,
+  ProductPersistedProps,
+  ProductStatus,
+} from "./product.types";
 import { ProductModel } from "../database/product.model";
 import { v4 as uuidv4 } from "uuid";
 import { ArgumentInvalidException } from "@/core/exceptions";
@@ -59,6 +63,7 @@ export class ProductEntity extends BaseEntity {
     title?: string;
     description?: string | null;
     priceCents?: number;
+    status?: ProductStatus;
   }) {
     let changed = false;
 
@@ -89,21 +94,18 @@ export class ProductEntity extends BaseEntity {
       changed = true;
     }
 
+    if (input.status !== undefined && input.status !== this._props.status) {
+      if (!input.status)
+        throw new ArgumentInvalidException("product status cannot be empty");
+      this._props.status = input.status;
+      changed = true;
+    }
+
     if (changed) {
       this.touch();
     }
-  }
 
-  publish() {
-    if (this._props.status === "published") return;
-    this._props.status = "published";
-    this.touch();
-  }
-
-  unpublish() {
-    if (this._props.status === "draft") return;
-    this._props.status = "draft";
-    this.touch();
+    return changed;
   }
 
   markContentUpdated() {

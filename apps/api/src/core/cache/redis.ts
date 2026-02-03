@@ -43,6 +43,11 @@ class RedisService implements CacheServicePort {
     if (!this.client) await this.connect();
     await this.client!.del(key);
   }
+
+  async increment(key: string): Promise<number> {
+    if (!this.client) await this.connect();
+    return await this.client!.incr(key);
+  }
 }
 
 export default RedisService;
