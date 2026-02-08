@@ -28,7 +28,7 @@ export default async function loginUser(fastify: FastifyInstance) {
           secure: true,
           httpOnly: true,
           sameSite: "none",
-          maxAge: 60 * 60 * 24 * 7,
+          maxAge: 60 * 60 * 24 * 30,
         })
         .status(200)
         .send({

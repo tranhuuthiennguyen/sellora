@@ -6,6 +6,7 @@ import { TokenServicePort } from "../../services/jwt.token.service";
 import { UserNotFoundError } from "@/modules/user/domain/user.error";
 import { UserEntity } from "@/modules/user/domain/user.entity";
 import { InvalidCredentialsErrorException } from "@/core/exceptions";
+import { compare } from "@/core/utils/password.util";
 
 export type LoginUserCommandResult = Promise<{
   accessToken: string;
@@ -44,7 +45,7 @@ class LoginUserHandler {
         "Password associate with this email hasn't been setup",
       );
     }
-    const isPasswordValid = await user.comparePassword(password);
+    const isPasswordValid = await compare(password, user.passwordHash);
     if (!isPasswordValid) {
       throw new InvalidCredentialsErrorException("Incorrect password");
     }

@@ -5,7 +5,7 @@ import addFormats from "ajv-formats";
 const ajvInstance = new Ajv({
   allErrors: true,
   strict: false,
-  coerceTypes: true,
+  coerceTypes: false,
 });
 
 AjvErrors(ajvInstance);

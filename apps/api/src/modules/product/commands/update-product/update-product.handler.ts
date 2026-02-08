@@ -4,7 +4,7 @@ import { ProductRepositoryPort } from "../../database/product.repository.port";
 import { updateProductRequestDto } from "./update-product.schema";
 import { ProductNotFoundError } from "../../domain/product.error";
 import { ForbiddenErrorException } from "@/core/exceptions";
-import { ProductEntity } from "../../domain/product.entity";
+import ProductEntity from "../../domain/product.entity";
 
 export type UpdateProductCommandResult = Promise<ProductEntity>;
 export const updateProductCommand = productActionCreator.actionCreator<
@@ -34,7 +34,7 @@ class UpdateProductHandler {
     }
 
     // check not change
-    if (!product.updateDetails(input)) {
+    if (!product.updateDetails(input, userId)) {
       console.log("product details doesnt change");
       return product;
     }

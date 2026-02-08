@@ -14,23 +14,29 @@ class UserRepository
 
   async updateOne(entity: UserEntity): Promise<UserEntity> {
     try {
+      const record = this.mapper.toPersistence(entity);
+
+      const updates = {
+        username: record.username,
+        displayName: record.displayName,
+        bio: record.bio,
+        profilePictureUrl: record.profilePictureUrl,
+        country: record.country,
+        state: record.state,
+        city: record.city,
+        zipCode: record.zipCode,
+        streetAddress: record.streetAddress,
+        currencyType: record.currencyType,
+        timeZone: record.timeZone,
+        tokenVersion: record.tokenVersion,
+        updatedAt: record.updatedAt,
+        updatedBy: record.updatedBy,
+      };
+
       const rows = await this.db`
         UPDATE ${this.db(this.tableName)}
-        SET
-          username = ${entity.username},
-          display_name = ${entity.displayName},
-          bio = ${entity.bio},
-          currency_type = ${entity.currencyType},
-          profile_picture_url = ${entity.profilePictureUrl},
-          country = ${entity.country},
-          state = ${entity.state},
-          city = ${entity.city},
-          zip_code = ${entity.zipCode},
-          street_address = ${entity.streetAddress},
-          time_zone = ${entity.timeZone},
-          updated_at = ${entity.updatedAt},
-          updated_by = ${entity.updatedBy}
-        WHERE id = ${entity.id}
+        SET ${this.db(updates)}
+        WHERE id = ${record.id}
         RETURNING *
       `;
       return this.mapper.toDomain(rows[0]);

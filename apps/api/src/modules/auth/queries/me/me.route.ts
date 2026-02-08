@@ -19,7 +19,7 @@ export default async function me(fastify: FastifyInstance) {
       return res.status(200).send({
         status: "success",
         statusCode: 200,
-        message: "AUTH_CURRENT_LOGIN_USER",
+        message: "Get current login user",
         correlationId: getRequestId(),
         data: {
           me: fastify.diContainer.cradle.userMapper.toResponse(req.me),

@@ -1,5 +1,5 @@
 import SqlRepositoryBase from "@/core/db/sql-repository.base";
-import { ProductEntity } from "../domain/product.entity";
+import ProductEntity from "../domain/product.entity";
 import { ProductRepositoryPort } from "./product.repository.port";
 import { DatabaseErrorException } from "@/core/exceptions";
 import { ProductModel } from "./product.model";

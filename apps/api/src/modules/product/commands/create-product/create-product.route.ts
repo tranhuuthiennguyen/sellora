@@ -38,7 +38,7 @@ export default async function createProduct(fastify: FastifyInstance) {
         );
       return res.status(200).send({
         statusCode: 200,
-        message: "PRODUCT_CREATED",
+        message: "New product created",
         correlationId: getRequestId(),
         data: {
           id,

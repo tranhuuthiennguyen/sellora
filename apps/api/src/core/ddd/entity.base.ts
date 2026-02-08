@@ -65,6 +65,61 @@ abstract class BaseEntity {
   get deletedAt() {
     return this._deletedAt;
   }
+
+  // ============== AUDIT METHODS ===============
+
+  /**
+   * Update audit fields when entity is modified
+   * @param userId - ID of user making the change
+   */
+  protected touch(userId: string) {
+    this._updatedAt = new Date().toISOString();
+    this._updatedBy = userId;
+  }
+
+  softDelete(userId: string) {
+    if (this._isDeleted) {
+      return;
+    }
+
+    this._isDeleted = true;
+    this._deletedAt = new Date().toISOString();
+    this._deletedBy = userId;
+    this.touch(userId);
+  }
+
+  restore(userId: string) {
+    if (!this._isDeleted) {
+      return;
+    }
+
+    this._isDeleted = false;
+    this._deletedAt = null;
+    this._deletedBy = null;
+    this.touch(userId);
+  }
+
+  disable(userId: string) {
+    if (!this._isEnabled) {
+      return;
+    }
+
+    this._isEnabled = false;
+    this.touch(userId);
+  }
+
+  enable(userId: string) {
+    if (this._isEnabled) {
+      return;
+    }
+
+    this._isEnabled = true;
+    this.touch(userId);
+  }
+
+  isActive() {
+    return !this._isDeleted && this._isEnabled;
+  }
 }
 
 export default BaseEntity;

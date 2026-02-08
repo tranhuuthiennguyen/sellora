@@ -1,9 +1,7 @@
 import { Mapper } from "@/core/ddd/mapper.interface";
-import { ProductEntity } from "./domain/product.entity";
+import ProductEntity from "./domain/product.entity";
 import { ProductResponseDto } from "./dtos/product.response.dto";
-import { ajv } from "@/core/utils/validator.util";
-import { ArgumentInvalidException } from "@/core/exceptions";
-import { ProductModel, productSchema } from "./database/product.model";
+import { ProductModel } from "./database/product.model";
 
 class ProductMapper implements Mapper<
   ProductEntity,
@@ -11,8 +9,7 @@ class ProductMapper implements Mapper<
   ProductResponseDto
 > {
   toPersistence(entity: ProductEntity): ProductModel {
-    const validator = ajv.compile(productSchema);
-    const record: ProductModel = {
+    return {
       id: entity.id,
       isEnabled: entity.isEnabled,
       isDeleted: entity.isDeleted,
@@ -28,18 +25,7 @@ class ProductMapper implements Mapper<
       priceCents: entity.priceCents,
       status: entity.status,
       contentUpdatedAt: entity.contentUpdatedAt,
-    };
-
-    const validate = validator(record);
-    if (!validate) {
-      throw new ArgumentInvalidException(
-        JSON.stringify(validator.errors),
-        new Error("Mapper Validation error"),
-        record,
-      );
-    }
-
-    return record;
+    } satisfies ProductModel;
   }
 
   toDomain(record: ProductModel): ProductEntity {

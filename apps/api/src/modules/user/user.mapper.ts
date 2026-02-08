@@ -1,9 +1,7 @@
 import { Mapper } from "@/core/ddd/mapper.interface";
 import { UserEntity } from "./domain/user.entity";
 import { UserResponseDto } from "./dtos/user.response.dto";
-import { ajv } from "@/core/utils/validator.util";
-import { ArgumentInvalidException } from "@/core/exceptions";
-import { UserModel, userSchema } from "./database/user.model";
+import { UserModel } from "./database/user.model";
 
 /**
  * Querying data from database to persistence layer: each Model object should contain all key-value (null is counted)
@@ -18,8 +16,7 @@ class UserMapper implements Mapper<UserEntity, UserModel, UserResponseDto> {
    * @returns {UserModel}
    */
   toPersistence(entity: UserEntity): UserModel {
-    const validator = ajv.compile(userSchema);
-    const record: UserModel = {
+    return {
       id: entity.id,
       isEnabled: entity.isEnabled,
       isDeleted: entity.isDeleted,
@@ -43,20 +40,7 @@ class UserMapper implements Mapper<UserEntity, UserModel, UserResponseDto> {
       streetAddress: entity.streetAddress,
       timeZone: entity.timeZone,
       tokenVersion: entity.tokenVersion,
-    };
-
-    console.log(entity);
-
-    const validate = validator(record);
-    if (!validate) {
-      throw new ArgumentInvalidException(
-        JSON.stringify(validator.errors),
-        new Error("Mapper Validation error"),
-        record,
-      );
-    }
-
-    return record;
+    } satisfies UserModel;
   }
   /**
    * Transform user model from database layer to domain layer when performing querying operation
@@ -116,7 +100,7 @@ class UserMapper implements Mapper<UserEntity, UserModel, UserResponseDto> {
       zipCode: entity.zipCode,
       streetAddress: entity.streetAddress,
       timeZone: entity.timeZone,
-    };
+    } satisfies UserResponseDto;
   }
 }
 

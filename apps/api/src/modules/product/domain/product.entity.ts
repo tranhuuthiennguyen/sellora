@@ -1,4 +1,3 @@
-import BaseEntity from "@/core/ddd/entity.base";
 import {
   CreateProductProps,
   ProductPersistedProps,
@@ -7,8 +6,9 @@ import {
 import { ProductModel } from "../database/product.model";
 import { v4 as uuidv4 } from "uuid";
 import { ArgumentInvalidException } from "@/core/exceptions";
+import { AggregateRoot } from "@/core/ddd/aggregate-root";
 
-export class ProductEntity extends BaseEntity {
+export default class ProductEntity extends AggregateRoot {
   private _props: ProductPersistedProps;
 
   private constructor(props: ProductModel) {
@@ -46,7 +46,7 @@ export class ProductEntity extends BaseEntity {
       deletedAt: null,
       sellerId: props.sellerId,
       title: props.title,
-      description: props.description ?? null,
+      description: props.description,
       priceCents: props.priceCents,
       status: props.status,
       contentUpdatedAt: now,
@@ -59,12 +59,15 @@ export class ProductEntity extends BaseEntity {
 
   // ============== BEHAVIORS ==============
 
-  updateDetails(input: {
-    title?: string;
-    description?: string | null;
-    priceCents?: number;
-    status?: ProductStatus;
-  }) {
+  updateDetails(
+    input: {
+      title?: string;
+      description?: string | null;
+      priceCents?: number;
+      status?: ProductStatus;
+    },
+    userId: string,
+  ) {
     let changed = false;
 
     if (input.title !== undefined && input.title !== this._props.title) {
@@ -102,28 +105,16 @@ export class ProductEntity extends BaseEntity {
     }
 
     if (changed) {
-      this.touch();
+      this.touch(userId);
     }
 
     return changed;
   }
 
-  markContentUpdated() {
+  markContentUpdated(userId: string) {
     const now = new Date().toISOString();
     this._props.contentUpdatedAt = now;
-    this.touch();
-  }
-
-  softDelete(deletedBy: string) {
-    if (this._isDeleted) return;
-    this._isDeleted = true;
-    this._deletedAt = new Date().toISOString();
-    this._deletedBy = deletedBy;
-  }
-
-  private touch() {
-    this._updatedAt = new Date().toISOString();
-    this._updatedBy = this.sellerId;
+    this.touch(userId);
   }
 
   // ========== GETTERS ==========

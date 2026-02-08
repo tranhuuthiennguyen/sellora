@@ -1,7 +1,7 @@
 import { ICommandBus } from "@/core/cqrs/bus.types";
 import { productActionCreator } from "../..";
 import { createProductRequestDto } from "./create-product.schema";
-import { ProductEntity } from "../../domain/product.entity";
+import ProductEntity from "../../domain/product.entity";
 import { ProductRepositoryPort } from "../../database/product.repository.port";
 
 export type CreateProductCommandResult = Promise<string>;

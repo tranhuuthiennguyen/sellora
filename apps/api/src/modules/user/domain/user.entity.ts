@@ -1,231 +1,211 @@
-import BaseEntity from "@/core/ddd/entity.base";
-import { CreateUserProps, UserPersistedProps } from "./user.types";
+import { CreateUserProps } from "./user.types";
 import { v4 as uuidv4 } from "uuid";
 import { UserModel } from "../database/user.model";
-import { ArgumentInvalidException, ConflictException } from "@/core/exceptions";
-import * as bcrypt from "bcrypt";
-import { updateUserRequestDto } from "../commands/update-user/update-user.schema";
+import { ConflictException } from "@/core/exceptions";
+import { compare, hash } from "@/core/utils/password.util";
+import { Address, Preferences, UserProfile } from "./value-objects";
+import { AggregateRoot } from "@/core/ddd/aggregate-root";
+import { UserPasswordChangedEvent } from "./events/user-password-changed.event";
 
-export class UserEntity extends BaseEntity {
-  private _props: UserPersistedProps;
+export class UserEntity extends AggregateRoot {
+  private _email: string;
+  private _passwordHash: string;
+  private _username: string;
+  private _profile: UserProfile;
+  private _address: Address;
+  private _preferences: Preferences;
+  private _tokenVersion: number;
 
   private constructor(props: UserModel) {
     super(props);
-    this._props = {
-      email: props.email,
-      passwordHash: props.passwordHash,
-      username: props.username,
-      currencyType: props.currencyType,
-      displayName: props.displayName,
-      bio: props.bio,
-      profilePictureUrl: props.profilePictureUrl,
-      country: props.country,
-      state: props.state,
-      city: props.city,
-      zipCode: props.zipCode,
-      streetAddress: props.streetAddress,
-      timeZone: props.timeZone,
-      tokenVersion: props.tokenVersion,
-    };
+    this._email = props.email;
+    this._passwordHash = props.passwordHash;
+    this._username = props.username;
+    this._tokenVersion = props.tokenVersion;
+
+    this._profile = new UserProfile(
+      props.displayName,
+      props.bio,
+      props.profilePictureUrl,
+    );
+
+    this._address = new Address(
+      props.country,
+      props.state,
+      props.city,
+      props.zipCode,
+      props.streetAddress,
+    );
+
+    this._preferences = new Preferences(props.currencyType, props.timeZone);
   }
 
   // ========== GETTERS ==========
-  get email() {
-    return this._props.email;
+  get email(): string {
+    return this._email;
   }
-  get passwordHash() {
-    return this._props.passwordHash;
+  get passwordHash(): string {
+    return this._passwordHash;
   }
-  get username() {
-    return this._props.username;
+  get username(): string {
+    return this._username;
   }
-  get currencyType() {
-    return this._props.currencyType;
+  get currencyType(): string {
+    return this._preferences.currencyType;
   }
-  get displayName() {
-    return this._props.displayName;
+  get displayName(): string | null {
+    return this._profile.displayName;
   }
-  get bio() {
-    return this._props.bio;
+  get bio(): string | null {
+    return this._profile.bio;
   }
-  get profilePictureUrl() {
-    return this._props.profilePictureUrl;
+  get profilePictureUrl(): string | null {
+    return this._profile.profilePictureUrl;
   }
-  get country() {
-    return this._props.country;
+  get country(): string | null {
+    return this._address.country;
   }
-  get state() {
-    return this._props.state;
+  get state(): string | null {
+    return this._address.state;
   }
-  get city() {
-    return this._props.city;
+  get city(): string | null {
+    return this._address.city;
   }
-  get zipCode() {
-    return this._props.zipCode;
+  get zipCode(): string | null {
+    return this._address.zipCode;
   }
-  get streetAddress() {
-    return this._props.streetAddress;
+  get streetAddress(): string | null {
+    return this._address.streetAddress;
   }
-  get timeZone() {
-    return this._props.timeZone;
+  get timeZone(): string {
+    return this._preferences.timeZone;
   }
-  get tokenVersion() {
-    return this._props.tokenVersion;
+  get tokenVersion(): number {
+    return this._tokenVersion;
   }
 
   // ========== METHODS ==========
-  hash(value: string, saltRounds = 10): Promise<string> {
-    return new Promise((resolve, reject) => {
-      bcrypt.genSalt(saltRounds, (err, salt) => {
-        if (err) return reject(err);
-        bcrypt.hash(value, salt, (err, hash) => {
-          if (err) return reject(err);
-          resolve(hash);
-        });
-      });
-    });
-  }
-
-  comparePassword(password: string): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      bcrypt.compare(password, this._props.passwordHash, (err, result) => {
-        if (err) return reject(err);
-        resolve(result);
-      });
-    });
-  }
 
   async changePassword(newPassword: string): Promise<void> {
     if (!newPassword) {
       throw new Error("New password hash must be provided");
     }
-    if (await this.comparePassword(newPassword)) {
+    if (await compare(newPassword, this._passwordHash)) {
       throw new ConflictException(
         "New password must be different from the old password.",
       );
     }
-    this._props.passwordHash = await this.hash(newPassword);
+
+    this._passwordHash = await hash(newPassword);
+
+    this.addDomainEvent(
+      new UserPasswordChangedEvent({
+        userId: this.id,
+        changedAt: new Date(),
+      }),
+    );
+
+    this.touch(this._id);
   }
 
-  updateDetails(input: updateUserRequestDto) {
-    let changed = false;
+  updateProfile(
+    input: {
+      displayName?: string | null;
+      bio?: string | null;
+      profilePictureUrl?: string | null;
+    },
+    userId: string,
+  ): boolean {
+    const newProfile = new UserProfile(
+      input.displayName !== undefined
+        ? input.displayName
+        : this._profile.displayName,
+      input.bio !== undefined ? input.bio : this._profile.bio,
+      input.profilePictureUrl !== undefined
+        ? input.profilePictureUrl
+        : this._profile.profilePictureUrl,
+    );
 
-    if (
-      input.username !== undefined &&
-      input.username !== this._props.username
-    ) {
-      if (!input.username)
-        throw new ArgumentInvalidException("username cannot be empty");
-      this._props.username = input.username;
-      changed = true;
+    if (this._profile.equals(newProfile)) {
+      return false;
     }
 
-    if (
-      input.displayName !== undefined &&
-      input.displayName !== this._props.displayName
-    ) {
-      if (!input.displayName)
-        throw new ArgumentInvalidException("display name cannot be empty");
-      this._props.displayName = input.displayName;
-      changed = true;
-    }
+    this._profile = newProfile;
 
-    if (input.bio !== undefined && input.bio !== this._props.bio) {
-      if (!input.bio) throw new ArgumentInvalidException("bio cannot be empty");
-      this._props.bio = input.bio;
-      changed = true;
-    }
+    // TODO: addDomainEvent
 
-    if (
-      input.currencyType !== undefined &&
-      input.currencyType !== this._props.currencyType
-    ) {
-      if (!input.currencyType)
-        throw new ArgumentInvalidException("currency type cannot be empty");
-      this._props.currencyType = input.currencyType;
-      changed = true;
-    }
-
-    if (
-      input.profilePictureUrl !== undefined &&
-      input.profilePictureUrl !== this._props.profilePictureUrl
-    ) {
-      if (!input.profilePictureUrl)
-        throw new ArgumentInvalidException(
-          "profile picture url cannot be empty",
-        );
-      this._props.profilePictureUrl = input.profilePictureUrl;
-      changed = true;
-    }
-
-    if (input.country !== undefined && input.country !== this._props.country) {
-      if (!input.country)
-        throw new ArgumentInvalidException("country cannot be empty");
-      this._props.country = input.country;
-      changed = true;
-    }
-
-    if (input.state !== undefined && input.state !== this._props.state) {
-      if (!input.state)
-        throw new ArgumentInvalidException("state cannot be empty");
-      this._props.state = input.state;
-      changed = true;
-    }
-
-    if (input.city !== undefined && input.city !== this._props.city) {
-      if (!input.city)
-        throw new ArgumentInvalidException("city cannot be empty");
-      this._props.city = input.city;
-      changed = true;
-    }
-
-    if (input.zipCode !== undefined && input.zipCode !== this._props.zipCode) {
-      if (!input.zipCode)
-        throw new ArgumentInvalidException("zip code cannot be empty");
-      this._props.zipCode = input.zipCode;
-      changed = true;
-    }
-
-    if (
-      input.streetAddress !== undefined &&
-      input.streetAddress !== this._props.streetAddress
-    ) {
-      if (!input.streetAddress)
-        throw new ArgumentInvalidException("street address cannot be empty");
-      this._props.streetAddress = input.streetAddress;
-      changed = true;
-    }
-
-    if (
-      input.timeZone !== undefined &&
-      input.timeZone !== this._props.timeZone
-    ) {
-      if (!input.timeZone)
-        throw new ArgumentInvalidException("time zone cannot be empty");
-      this._props.timeZone = input.timeZone;
-      changed = true;
-    }
-
-    if (changed) {
-      this.touch();
-    }
+    this.touch(userId);
+    return true;
   }
 
-  private touch() {
-    this._updatedAt = new Date().toISOString();
-    this._updatedBy = this.id;
+  updateAddress(
+    input: {
+      country?: string | null;
+      state?: string | null;
+      city?: string | null;
+      zipCode?: string | null;
+      streetAddress?: string | null;
+    },
+    userId: string,
+  ): boolean {
+    const newAddress = new Address(
+      input.country !== undefined ? input.country : this._address.country,
+      input.state !== undefined ? input.state : this._address.state,
+      input.city !== undefined ? input.city : this._address.city,
+      input.zipCode !== undefined ? input.zipCode : this._address.zipCode,
+      input.streetAddress !== undefined
+        ? input.streetAddress
+        : this._address.streetAddress,
+    );
+
+    if (this._address.equals(newAddress)) {
+      return false;
+    }
+
+    this._address = newAddress;
+
+    // TODO: addDomainEvent
+
+    this.touch(userId);
+    return true;
+  }
+
+  updatePreferences(
+    input: {
+      currencyType?: string;
+      timeZone?: string;
+    },
+    userId: string,
+  ): boolean {
+    const newPreferences = new Preferences(
+      input.currencyType !== undefined
+        ? input.currencyType
+        : this._preferences.currencyType,
+      input.timeZone !== undefined
+        ? input.timeZone
+        : this._preferences.timeZone,
+    );
+
+    if (this._preferences.equals(newPreferences)) {
+      return false;
+    }
+
+    this._preferences = newPreferences;
+
+    // TODO: addDomainEvent
+
+    this.touch(userId);
+    return true;
   }
 
   // ================= FACTORIES =================
 
-  static async createNew(props: CreateUserProps): Promise<UserEntity> {
-    if (!props.email) throw new Error("User must have an email");
-    if (!props.username) throw new Error("User must have a username");
-    if (!props.password) throw new Error("User must have a password");
-
+  static async createNew(
+    props: CreateUserProps,
+    hassedPassword: string,
+  ): Promise<UserEntity> {
     const now = new Date().toISOString();
     const uuid = uuidv4();
-    const hashed = await new UserEntity({} as UserModel).hash(props.password);
 
     return new UserEntity({
       id: uuid,
@@ -238,7 +218,7 @@ export class UserEntity extends BaseEntity {
       deletedBy: null,
       deletedAt: null,
       email: props.email,
-      passwordHash: hashed,
+      passwordHash: hassedPassword,
       username: props.username,
       currencyType: "USD",
 
@@ -251,7 +231,7 @@ export class UserEntity extends BaseEntity {
       zipCode: null,
       streetAddress: null,
       timeZone: "Pacific Time (US & Canada)",
-      tokenVersion: 1,
+      tokenVersion: 0,
     });
   }
 

@@ -51,7 +51,8 @@ INSERT INTO users (
   zip_code,
   street_address,
   created_by,
-  updated_by
+  updated_by,
+  token_version
 )
 VALUES
 (
@@ -69,7 +70,8 @@ VALUES
   '94105',
   '1 Market Street',
   '0bb35df6-c89c-4520-a7f0-0bd727a49c57',
-  '0bb35df6-c89c-4520-a7f0-0bd727a49c57'
+  '0bb35df6-c89c-4520-a7f0-0bd727a49c57',
+  0
 ),
 (
   'afae806d-f661-4227-a494-c965a51db5ee',
@@ -86,7 +88,8 @@ VALUES
   '10001',
   '123 Main St',
   '0bb35df6-c89c-4520-a7f0-0bd727a49c57',
-  '0bb35df6-c89c-4520-a7f0-0bd727a49c57'
+  '0bb35df6-c89c-4520-a7f0-0bd727a49c57',
+  0
 ),
 (
   '0041d5de-6cf9-4e00-b3b7-675f19bb9771',
@@ -103,7 +106,8 @@ VALUES
   '80331',
   'Marienplatz 1',
   '0bb35df6-c89c-4520-a7f0-0bd727a49c57',
-  '0bb35df6-c89c-4520-a7f0-0bd727a49c57'
+  '0bb35df6-c89c-4520-a7f0-0bd727a49c57',
+  0
 );
 
 -- Assign roles to users

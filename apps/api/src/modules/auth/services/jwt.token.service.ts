@@ -52,22 +52,23 @@ class JwtTokenService implements TokenServicePort {
       const payload = (await verifier(token)) as JwtPayload;
 
       if (this._cacheService) {
-        const isBlacklisted = await this._cacheService.get(
-          `blacklist:token:${payload.jti}`,
-        );
+      }
+      const isBlacklisted = await this._cacheService.get(
+        `blacklist:token:${payload.jti}`,
+      );
 
-        if (isBlacklisted) {
-          throw new Error("Token has been revoked");
-        }
+      if (isBlacklisted) {
+        throw new Error("Token has been revoked");
+      }
 
-        const currentVersion =
-          (await this._cacheService.get(
-            `user:${payload.userId}:token_version`,
-          )) || 1;
+      const currentVersion = await this._cacheService.get(
+        `user:${payload.userId}:token_version`,
+      );
 
-        if (payload.tokenVersion !== currentVersion) {
-          throw new Error("Token has been invalidated");
-        }
+      const expectedVersion = currentVersion !== null ? currentVersion : 0;
+
+      if (payload.tokenVersion !== expectedVersion) {
+        throw new Error("Token has been invalidated");
       }
 
       return payload;
@@ -112,7 +113,6 @@ class JwtTokenService implements TokenServicePort {
   async revokeToken(token: string): Promise<void> {
     try {
       const payload = this.decode(token);
-
       const now = Math.floor(Date.now() / 1000);
       const ttl = payload.exp - now;
 
@@ -129,11 +129,13 @@ class JwtTokenService implements TokenServicePort {
   }
 
   async revokeAllUserTokens(userId: string): Promise<void> {
+    if (!this._cacheService) return;
     await this._cacheService.increment(`user:${userId}:token_version`);
     await this._cacheService.del(`user:${userId}`);
   }
 
   async isRevoked(jti: string): Promise<boolean> {
+    if (!this._cacheService) return false;
     const revoked = await this._cacheService.get(`blacklist:token:${jti}`);
     return !!revoked;
   }

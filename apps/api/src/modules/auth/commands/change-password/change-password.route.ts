@@ -9,10 +9,7 @@ import {
 } from "./change-password.schema";
 import { apiResponseSchema } from "@/core/api/api.response";
 import { getRequestId } from "@/core/app/app-request.context";
-import {
-  ForbiddenErrorException,
-  InvalidCredentialsErrorException,
-} from "@/core/exceptions";
+import { ForbiddenErrorException } from "@/core/exceptions";
 
 export default async function changePassword(fastify: FastifyInstance) {
   fastify.route({

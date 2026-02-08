@@ -34,7 +34,7 @@ CREATE TABLE users (
 	zip_code VARCHAR(20),
 	street_address VARCHAR(100),
 	time_zone VARCHAR(255) DEFAULT 'Pacific Time (US & Canada)' NOT NULL,
-	token_version INTEGER DEFAULT 1 NOT NULL,
+	token_version INTEGER NOT NULL,
 	-- AUDIT
 	is_enabled BOOLEAN DEFAULT TRUE,
 	is_deleted BOOLEAN DEFAULT FALSE,

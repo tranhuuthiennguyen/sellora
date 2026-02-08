@@ -10,6 +10,7 @@ import {
 import { apiResponseSchema } from "@/core/api/api.response";
 import { getRequestId } from "@/core/app/app-request.context";
 import { userResponseDtoSchema } from "../../dtos/user.response.dto";
+import { ForbiddenErrorException } from "@/core/exceptions";
 
 export default async function updateUser(fastify: FastifyInstance) {
   fastify.route({
@@ -24,27 +25,65 @@ export default async function updateUser(fastify: FastifyInstance) {
       },
     },
     onRequest: fastify.authenticate,
+    preHandler: async (
+      req: FastifyRequest<{
+        Params: {
+          userId: string;
+        };
+        Body: updateUserRequestDto;
+      }>,
+      _,
+      done,
+    ) => {
+      await fastify.diContainer.cradle.authorizationService.authorize(
+        req.me.id,
+        "user.update.own",
+      );
+      done;
+    },
     handler: async (
       req: FastifyRequest<{
         Params: {
           userId: string;
         };
+        Body: updateUserRequestDto;
       }>,
       res,
     ) => {
       const { userId } = req.params;
+      const body = req.body;
+
+      if (userId !== req.me.id) {
+        throw new ForbiddenErrorException("action denied");
+      }
 
       const user =
         await fastify.diContainer.cradle.commandBus.execute<UpdateUserCommandResult>(
           updateUserCommand({
             userId: userId,
-            ...(req.body as updateUserRequestDto),
+            profile: {
+              displayName: body.displayName,
+              bio: body.bio,
+              profilePictureUrl: body.profilePictureUrl,
+            },
+            address: {
+              country: body.country,
+              state: body.state,
+              city: body.city,
+              zipCode: body.zipCode,
+              streetAddress: body.streetAddress,
+            },
+            preferences: {
+              currencyType: body.currencyType,
+              timeZone: body.timeZone,
+            },
           }),
         );
+
       return res.status(200).send({
         status: "success",
         statusCode: 200,
-        message: "USER_UPDATED_SUCCESSFULLY",
+        message: "user details updated successfully",
         correlationId: getRequestId(),
         data: {
           user: fastify.diContainer.cradle.userMapper.toResponse(user),
