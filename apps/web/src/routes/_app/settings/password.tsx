@@ -1,7 +1,9 @@
 import { authApi } from "@/api/auth";
+import { meQuery } from "@/api/auth/queries";
 import SettingsNavBar from "@/components/settings/SettingsNavBar";
+import { useAuth } from "@/contexts/AuthContext";
 import { useAppForm } from "@/hooks/form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 
@@ -11,6 +13,10 @@ export const Route = createFileRoute("/_app/settings/password")({
 
 function RouteComponent() {
   const queryClient = useQueryClient();
+  const { accessToken } = useAuth();
+  const { data } = useQuery(meQuery(accessToken));
+
+  const user = data.data.me;
   const mutation = useMutation({
     mutationKey: ["password", "update"],
     mutationFn: async ({
@@ -20,7 +26,11 @@ function RouteComponent() {
       oldPassword: string;
       newPassword: string;
     }) => {
-      const res = await authApi.changePassword(oldPassword, newPassword);
+      const res = await authApi.changePassword(
+        user.email,
+        oldPassword,
+        newPassword,
+      );
       return res;
     },
     onSuccess: () => {

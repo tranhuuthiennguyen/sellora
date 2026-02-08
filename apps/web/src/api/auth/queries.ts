@@ -22,9 +22,9 @@ export const bootstrapAuthQuery = () => ({
   gcTime: Infinity,
 });
 
-export const meQuery = () => ({
+export const meQuery = (token?: string | null) => ({
   queryKey: ["me"],
   queryFn: async () => {
-    return await authApi.me();
+    return await authApi.me(token);
   },
 });

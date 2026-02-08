@@ -26,6 +26,10 @@ Sellora is an E-Commerce platform selling digital products inspired by GumRoad b
    task up-prod
    ```
 
+## The dilemma of Product
+* product main infos: name, description, price
+* product main contents: blog-like structure
+
 ## Backlog
 
 ### Configuration

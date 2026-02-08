@@ -26,41 +26,51 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SettingsFormProvider } from "@/contexts/SettingsFormContext";
 import { Toaster } from "@/components/ui/sonner";
+import { useQuery } from "@tanstack/react-query";
+import { authApi } from "@/api/auth";
+import type { getUserResponseDto } from "@/api/user/user.dto";
+import { Spinner } from "@/components/ui/spinner";
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
 });
 
 function AppLayout() {
-  const { isBootstrapping, isAuthenticated } = useAuth();
+  const { accessToken, isAuthenticated, logout, isLoading } = useAuth();
 
   const navigate = useNavigate();
+
+  const { data, isSuccess } = useQuery({
+    queryKey: ["me"],
+    queryFn: async () => {
+      return await authApi.me(accessToken);
+    },
+  });
+
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   if (!isAuthenticated) {
     navigate({ to: "/login" });
   }
 
-  if (isBootstrapping) {
-    return <div className="text-white p-6">Loading…</div>;
-  }
+  if (isSuccess) {
+    return (
+      <div className="h-screen flex flex-col bg-tuatara text-gray-200">
+        {/* Main content area */}
+        <div className="flex flex-1 overflow-hidden">
+          <Sidebar user={data.data.me} logout={logout} />
 
-  return (
-    <div className="h-screen flex flex-col bg-tuatara text-gray-200">
-      {/* Main content area */}
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar />
-
-        <main className="flex-1 overflow-y-auto">
-          <SettingsFormProvider>
+          <main className="flex-1 overflow-y-auto">
             <Outlet />
-          </SettingsFormProvider>
-        </main>
-        <Toaster />
+          </main>
+          <Toaster />
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 }
 
 const menuItems = [
@@ -77,11 +87,13 @@ const menuItems = [
   { label: "Help", to: "/help", icon: HelpCircle },
 ];
 
-export function Sidebar() {
-  const { user, logout } = useAuth();
-
-  if (!user) return null;
-
+export function Sidebar({
+  user,
+  logout,
+}: {
+  user: getUserResponseDto;
+  logout: () => Promise<void>;
+}) {
   return (
     <aside className="w-45 h-screen bg-main-bg border-r border-neutral-800 overflow-y-auto flex flex-col">
       {/* Top Bar */}

@@ -1,9 +1,9 @@
 import { meQuery } from "@/api/auth/queries";
-import { usersApi } from "@/api/users";
+import { usersApi } from "@/api/user";
+import type { updateUserRequestDto } from "@/api/user/user.dto";
 import SettingsNavBar from "@/components/settings/SettingsNavBar";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAppForm } from "@/hooks/form";
-import type { UpdateUserDto } from "@sellora/shared";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
@@ -14,13 +14,13 @@ export const Route = createFileRoute("/_app/settings/profile")({
 
 function RouteComponent() {
   const queryClient = useQueryClient();
-  const { data } = useQuery(meQuery());
-  const { user } = useAuth();
+  const { accessToken } = useAuth();
+  const { data } = useQuery(meQuery(accessToken));
 
-  if (!user) throw new Error("WHERE TF IS USER????");
+  const user = data.data.me;
 
   const mutation = useMutation({
-    mutationFn: async (payload: UpdateUserDto) => {
+    mutationFn: async (payload: updateUserRequestDto) => {
       return await usersApi.patch(user.id, payload);
     },
     onSuccess: () => {
@@ -31,9 +31,9 @@ function RouteComponent() {
 
   const form = useAppForm({
     defaultValues: {
-      username: data?.user.username ?? "",
-      displayName: data?.user.displayName ?? "",
-      bio: data?.user.bio ?? "",
+      username: user.username ?? "",
+      displayName: user.displayName ?? "",
+      bio: user.bio ?? "",
     },
     onSubmit: ({ value }) => {
       mutation.mutate(value);

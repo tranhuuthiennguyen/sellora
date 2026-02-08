@@ -30,3 +30,8 @@ export {
 } from "./user/user.schema";
 export { IsEmail, EmailSchema, PasswordSchema } from "./validation/format";
 export { validateValue, UserFieldSchemas } from "./validation/validateSchema";
+export {
+  ProductSchema,
+  GetAllProductsResponseSchema,
+} from "./products/products.schema";
+export type { ProductEntity } from "./products/products.entity";

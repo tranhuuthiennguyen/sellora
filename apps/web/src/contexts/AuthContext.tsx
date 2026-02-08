@@ -2,14 +2,14 @@ import { api } from "@/api";
 import {
   createContext,
   useContext,
+  useEffect,
   useLayoutEffect,
-  useMemo,
   useState,
   type ReactNode,
 } from "react";
-import { ERRORS, type UserEntity } from "@sellora/shared";
 import { authApi } from "@/api/auth";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { getUserResponseDto } from "@/api/user/user.dto";
 
 declare module "axios" {
   export interface AxiosRequestConfig {
@@ -18,18 +18,19 @@ declare module "axios" {
 }
 
 type AuthContextType = {
-  user: UserEntity | null;
+  user: getUserResponseDto | null;
   accessToken: string | null;
-  register: (email: string, password: string) => Promise<any>;
   login: (email: string, password: string) => Promise<any>;
   logout: () => Promise<any>;
   isAuthenticated: boolean;
-  isBootstrapping: boolean;
+  isLoading: boolean;
 };
 
-// type AuthStatus = "unknown" | "authenticated" | "unauthenticated"
+type AuthStatus = "loading" | "authenticated" | "unauthenticated";
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(
+  undefined,
+);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -43,22 +44,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient();
 
   const [token, setToken] = useState<string | null>(null);
-
-  /* -----------------------------
-   * Boostrap auth (refresh + me)
-   * ----------------------------- */
-  const bootstrapQuery = useQuery({
-    queryKey: ["auth", "bootstrap"],
-    queryFn: async () => {
-      const { accessToken } = await authApi.refresh();
-      setToken(accessToken);
-
-      const { user } = await authApi.me();
-      return user;
-    },
-    retry: true,
-    staleTime: Infinity,
-  });
+  const [status, setStatus] = useState<AuthStatus>("loading");
 
   /* ----------------------------------
    * Mutations
@@ -66,24 +52,58 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const loginMutation = useMutation({
     mutationFn: ({ email, password }: { email: string; password: string }) =>
       authApi.login(email, password),
-    onSuccess: ({ accessToken, user }) => {
-      setToken(accessToken);
-      queryClient.setQueryData(["auth", "user"], user);
+    onSuccess: ({ data }) => {
+      setToken(data.accessToken);
+      setStatus("authenticated");
+      // queryClient.setQueryData(["user"], data.user);
+    },
+    onError: () => {
+      setStatus("unauthenticated");
     },
   });
 
-  const registerMutation = useMutation({
-    mutationFn: ({ email, password }: { email: string; password: string }) =>
-      authApi.register(email, password),
-  });
+  // const registerMutation = useMutation({
+  //   mutationFn: ({ email, password }: { email: string; password: string }) =>
+  //     authApi.register(email, password),
+  // });
 
   const logoutMutation = useMutation({
     mutationFn: authApi.logout,
     onSuccess: () => {
       setToken(null);
+      setStatus("unauthenticated");
       queryClient.clear();
     },
   });
+
+  /* ----------------------------------
+   * Refresh on app mount
+   * ---------------------------------- */
+  useEffect(() => {
+    let cancelled = false;
+
+    async function bootstrapAuth() {
+      try {
+        setStatus("loading");
+        const { data } = await authApi.refresh();
+        if (!cancelled) {
+          setToken(data.accessToken);
+          setStatus("authenticated");
+        }
+      } catch {
+        if (!cancelled) {
+          setToken(null);
+          setStatus("unauthenticated");
+        }
+      }
+    }
+
+    bootstrapAuth();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   /* ----------------------------------
    * Axios interceptors
@@ -102,25 +122,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       (res) => res,
       async (error) => {
         const original = error.config;
-
         if (
           error.response?.status === 401 &&
-          error.response?.data.message === ERRORS.unauthorizedAccess.message
-          // !original._retry &&
-          // !original.url?.includes("/auth/refresh")
+          error.response?.data.message === "Unauthorized"
+          // original._retry
         ) {
           try {
-            const { accessToken } = await authApi.refresh();
-            setToken(accessToken);
+            setStatus("loading");
+
+            const { data } = await authApi.refresh();
+            setToken(data.accessToken);
+            setStatus("authenticated");
 
             original._retry = true;
-            original.headers.Authorization = `Bearer ${accessToken}`;
+            original.headers.Authorization = `Bearer ${data.accessToken}`;
 
             return api(original);
           } catch {
             setToken(null);
+            setStatus("unauthenticated");
             queryClient.clear();
           }
+        } else if (
+          error.response?.status === 401 &&
+          error.response?.data.message === "AUTH_REFRESH_NOT_FOUND" &&
+          error.response?.data.error === "INVALID_CREDENTIALS"
+        ) {
+          console.log("AUTH_REFRESH_TOKEN_INVALID");
+          setToken(null);
+          setStatus("unauthenticated");
+          queryClient.clear();
         }
 
         return Promise.reject(error);
@@ -131,55 +162,45 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       api.interceptors.request.eject(reqInterceptor);
       api.interceptors.response.eject(resInterceptor);
     };
-  }, [token, queryClient]);
+  }, [token]);
 
   /* ----------------------------------
    * Derived state
    * ---------------------------------- */
-  const user = bootstrapQuery.data ?? null;
+  const isLoading = status === "loading";
 
-  const value = useMemo<AuthContextType>(
-    () => ({
-      user,
-      accessToken: token,
-      isAuthenticated: !!token,
-      isBootstrapping: bootstrapQuery.isLoading,
-      register: async (email, password) => {
-        try {
-          await registerMutation.mutateAsync({ email, password });
-          return { success: true };
-        } catch (error: any) {
-          return {
-            success: false,
-            message: error.response?.data?.message,
-          };
-        }
-      },
-      login: async (email, password) => {
-        try {
-          await loginMutation.mutateAsync({ email, password });
-          return { success: true };
-        } catch (error: any) {
-          return {
-            success: false,
-            message: error.response?.data?.message,
-          };
-        }
-      },
-      logout: async () => {
-        try {
-          await logoutMutation.mutateAsync();
-          return { success: true };
-        } catch (error: any) {
-          return {
-            success: false,
-            message: error.response?.data?.message,
-          };
-        }
-      },
-    }),
-    [user, token, bootstrapQuery.isLoading],
+  return (
+    <AuthContext.Provider
+      value={{
+        user: null,
+        accessToken: token,
+        isAuthenticated: !!token,
+        isLoading,
+        login: async (email, password) => {
+          try {
+            await loginMutation.mutateAsync({ email, password });
+            return { success: true };
+          } catch (error: any) {
+            return {
+              success: false,
+              message: error.response?.data?.message,
+            };
+          }
+        },
+        logout: async () => {
+          try {
+            await logoutMutation.mutateAsync();
+            return { success: true };
+          } catch (error: any) {
+            return {
+              success: false,
+              message: error.response?.data?.message,
+            };
+          }
+        },
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
   );
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:18
+    image: postgres:18-alpine
     restart: "always"
     ports:
       - 5432:5432 # dev only
@@ -30,66 +30,136 @@ services:
     environment:
       ADMINER_DEFAULT_SERVER: postgres
 
-  api:
-    build:
-      context: .
-      dockerfile: apps/api/Dockerfile
-    restart: always
-    env_file:
-      - ./apps/api/.env.development
-    container_name: api
-    develop:
-      watch:
-        - action: sync
-          path: ./apps/api/src
-          target: /app/apps/api/src
-          ignore:
-            - ./node_modules/
-        - action: rebuild
-          path: ./apps/api/package.json
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - backend
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    container_name: redis
     ports:
-      - 5000:5000
-  
-  web:
-    build:
-      context: .
-      dockerfile: apps/web/Dockerfile
-    restart: always
-    container_name: web
-    develop:
-      watch:
-        - action: sync
-          path: ./apps/web/src
-          target: /app/apps/web/src
-          ignore:
-            - ./node_modules/
-        - action: rebuild
-          path: ./apps/web/package.json
-    depends_on:
-      - api
-    networks:
-      - backend
-    ports:
-      - 3000:3000
-
-  nginx:
-    image: nginx:alpine
-    restart: always
-    ports:
-      - 80:80
-    container_name: nginx
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
     volumes:
-      - ./nginx/default.conf:/etc/nginx/default.conf:ro
-    depends_on:
-      - api
-      - web
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
     networks:
       - backend
+      
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    restart: unless-stopped
+    container_name: redis-commander
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    networks:
+      - backend
+
+  s3:
+    image: minio/minio
+    restart: on-failure
+    container_name: s3
+    volumes:
+      - ./s3-data:/data
+    ports:
+      - 9000:9000
+      - 9001:9001
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address :9001
+
+  createbuckets:
+    image: minio/mc
+    container_name: createbuckets
+    depends_on:
+      - s3
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://s3:9000 minioadmin minioadmin;
+      /usr/bin/mc mb myminio/antlms;
+      /usr/bin/mc anonymous set public myminio/sellora;
+      exit 0;"
+
+  # api:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/api/Dockerfile
+  #   restart: always
+  #   env_file:
+  #     - ./apps/api/.env.development
+  #   container_name: api
+  #   develop:
+  #     watch:
+  #       - action: sync
+  #         path: ./apps/api/src
+  #         target: /app/apps/api/src
+  #         ignore:
+  #           - ./node_modules/
+  #       - action: rebuild
+  #         path: ./apps/api/package.json
+  #       - action: sync
+  #         path: ./packages/shared/src
+  #         target: /app/packages/shared/src
+  #         ignore:
+  #           - ./node_modules/
+  #       - action: rebuild
+  #         path: ./packages/shared/package.json
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   networks:
+  #     - backend
+  #   ports:
+  #     - 5000:5000
+  
+  # web:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/web/Dockerfile
+  #   restart: always
+  #   container_name: web
+  #   develop:
+  #     watch:
+  #       - action: sync
+  #         path: ./apps/web/src
+  #         target: /app/apps/web/src
+  #         ignore:
+  #           - ./node_modules/
+  #       - action: rebuild
+  #         path: ./apps/web/package.json
+  #       - action: sync
+  #         path: ./packages/shared/src
+  #         target: /app/packages/shared/src
+  #         ignore:
+  #           - ./node_modules/
+  #       - action: rebuild
+  #         path: ./packages/shared/package.json
+  #   depends_on:
+  #     - api
+  #   networks:
+  #     - backend
+  #   ports:
+  #     - 3000:3000
+
+  # nginx:
+  #   image: nginx:alpine
+  #   restart: always
+  #   ports:
+  #     - 80:80
+  #   container_name: nginx
+  #   volumes:
+  #     - ./nginx/default.conf:/etc/nginx/default.conf:ro
+  #   depends_on:
+  #     - api
+  #     - web
+  #   networks:
+  #     - backend
 
 networks:
   backend:
@@ -101,3 +171,4 @@ networks:
 
 volumes:
   pg_data:
+  redisdata:
